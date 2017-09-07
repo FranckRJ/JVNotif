@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="lineSeparationColor">#50808080</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#757575</color>
+    <color name="navigationIconColor">#90000000</color>
+    <color name="headerTextColor">#90000000</color>
+</resources>
