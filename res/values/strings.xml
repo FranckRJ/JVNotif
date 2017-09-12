@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preference_file_key" translatable="false">com.franckrj.jvnotif.PREFERENCE_FILE_KEY</string>
     <string name="app_name">JVNotif</string>
     <string name="home">Accueil</string>
     <string name="openDrawerContentDescRes">Ouvrir</string>
@@ -12,11 +13,12 @@
     <string name="errorNicknameMissingAddAnAccount">Veuillez insérer le pseudo avec lequel vous vous êtes connecté dans le champ en haut.</string>
     <string name="errorCookiesMissingAddAnAccount">Vous n\'êtes pas connecté sur JVC.</string>
     <string name="warningNotConnected">Vous ne vous êtes pas connecté</string>
-    <string name="preference_file_key" translatable="false">com.franckrj.jvnotif.PREFERENCE_FILE_KEY</string>
     <string name="connectionSuccessful">Connexion réussie</string>
     <string name="errorActionAlreadyRunning">Erreur, action déjà en cours.</string>
     <string name="mpChannel">MP</string>
     <string name="mpChannelDesc">MP de JVC</string>
     <string name="accountsWithNewMP">Sur %1$s</string>
     <string name="newNumberOfMP">%1$s nouveau(x) MP</string>
+    <string name="noNewMP">Pas de nouveaux MP</string>
+    <string name="connectToZeroAccount">Vous n\'êtes connecté à aucun compte</string>
 </resources>

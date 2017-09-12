@@ -28,11 +28,16 @@ class MainActivity : AbsNavigationViewActivity() {
                 val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
                 listOfNumberOfMPPerAccounts.clear()
-                for (account in listOfAccounts) {
-                    val newRequest = GetNumberOfMPForAccount(account.nickname, account.cookie)
 
-                    listOfCurrentRequests.add(newRequest)
-                    newRequest.execute()
+                if (listOfAccounts.isNotEmpty()) {
+                    for (account in listOfAccounts) {
+                        val newRequest = GetNumberOfMPForAccount(account.nickname, account.cookie)
+
+                        listOfCurrentRequests.add(newRequest)
+                        newRequest.execute()
+                    }
+                } else {
+                    Toast.makeText(this@MainActivity, R.string.connectToZeroAccount, Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(this@MainActivity, R.string.errorActionAlreadyRunning, Toast.LENGTH_SHORT).show()
@@ -70,6 +75,8 @@ class MainActivity : AbsNavigationViewActivity() {
             val title: String = getString(R.string.newNumberOfMP, totalNumberOfMP.toString())
 
             NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, this)
+        } else {
+            Toast.makeText(this, R.string.noNewMP, Toast.LENGTH_SHORT).show()
         }
     }
 

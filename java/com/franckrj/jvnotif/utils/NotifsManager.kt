@@ -12,6 +12,7 @@ import android.support.v4.util.SimpleArrayMap
 import com.franckrj.jvnotif.R
 
 /*TODO: Améliorer la personnalisation des notifs (genre le truc de lockscreen etc par ex).*/
+/*TODO: La couleur de la notification n'est pas la bonne.*/
 object NotifsManager {
     private val listOfNotifType: SimpleArrayMap<NotifTypeInfo.Names, NotifTypeInfo> = SimpleArrayMap()
 
@@ -20,7 +21,7 @@ object NotifsManager {
                                         4,
                                         context.getString(R.string.mpChannel),
                                         context.getString(R.string.mpChannelDesc),
-                                        Color.YELLOW,
+                                        Color.rgb(255, 140, 0),
                                         1000,
                                         1000,
                                         longArrayOf(0, 200, 200, 200),
@@ -35,9 +36,9 @@ object NotifsManager {
                 val newChannel = NotificationChannel(newNotifType.channelID, newNotifType.channelName, newNotifType.importance)
 
                 newChannel.description = newNotifType.channelDesc
-                if (newNotifType.lightColor != null) {
+                if (newNotifType.lightAndNotifColor != null) {
                     newChannel.enableLights(true)
-                    newChannel.lightColor = (newNotifType.lightColor)
+                    newChannel.lightColor = (newNotifType.lightAndNotifColor)
                 } else {
                     newChannel.enableLights(false)
                 }
@@ -60,11 +61,12 @@ object NotifsManager {
             val notificationService = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notificationBuilder = NotificationCompat.Builder(context, notifType.channelID)
 
-            notificationBuilder.setSmallIcon(R.mipmap.ic_notif)
+            notificationBuilder.setSmallIcon(R.drawable.ic_notif)
             notificationBuilder.setContentTitle(contentTitle)
             notificationBuilder.setContentText(contentText)
-            if (notifType.lightColor != null) {
-                notificationBuilder.setLights(notifType.lightColor, notifType.lightOnMS, notifType.lightOffMS)
+            if (notifType.lightAndNotifColor != null) {
+                notificationBuilder.color = notifType.lightAndNotifColor
+                notificationBuilder.setLights(notifType.lightAndNotifColor, notifType.lightOnMS, notifType.lightOffMS)
             }
             if (notifType.vibratePattern.isNotEmpty()) {
                 notificationBuilder.setVibrate(notifType.vibratePattern)
@@ -81,7 +83,7 @@ object NotifsManager {
                         val notifID: Int = 0,
                         val channelName: String = "",
                         val channelDesc: String = "",
-                        @ColorInt val lightColor: Int? = null,
+                        @ColorInt val lightAndNotifColor: Int? = null,
                         val lightOnMS: Int = 0,
                         val lightOffMS: Int = 0,
                         val vibratePattern: LongArray = LongArray(0),

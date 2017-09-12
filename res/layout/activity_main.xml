@@ -10,6 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- Solution bizarre pour que le drawer s'ouvre sans problème,
+             sans ça il s'accroche au bord de l'écran et fait que s'entrouvrir -->
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
         <Button
             android:id="@+id/checknotif_button_main"
             android:layout_width="wrap_content"
