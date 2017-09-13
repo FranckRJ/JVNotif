@@ -22,7 +22,7 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     @Suppress("ObjectLiteralToLambda")
-    private val checkNotifClickedListener: View.OnClickListener = object : View.OnClickListener {
+    private val checkNotifClickedListener = object : View.OnClickListener {
         override fun onClick(view: View?) {
             if (listOfCurrentRequests.isEmpty()) {
                 val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
@@ -34,6 +34,7 @@ class MainActivity : AbsNavigationViewActivity() {
                         val newRequest = GetNumberOfMPForAccount(account.nickname, account.cookie)
 
                         listOfCurrentRequests.add(newRequest)
+                        newRequest.numberOfMPListener = newNumberOfMPReceivedListener
                         newRequest.execute()
                     }
                 } else {
@@ -45,13 +46,15 @@ class MainActivity : AbsNavigationViewActivity() {
         }
     }
 
-    private fun newNumberOfMPReceived(forNickname: String, newNumberOfMP: String?, withThisRequest: GetNumberOfMPForAccount) {
-        listOfCurrentRequests.remove(withThisRequest)
-        listOfNumberOfMPPerAccounts.put(forNickname, newNumberOfMP ?: "")
+    private val newNumberOfMPReceivedListener = object : GetNumberOfMPForAccount.NewNumberOfMPListener {
+        override fun newNumberOfMPReceived(nicknameOfAccount: String, numberOfMP: String?, getter: GetNumberOfMPForAccount) {
+            listOfCurrentRequests.remove(getter)
+            listOfNumberOfMPPerAccounts.put(nicknameOfAccount, numberOfMP ?: "")
 
-        /*Une fois que toutes les requêtes sont terminées on affiche une notif.*/
-        if (listOfCurrentRequests.isEmpty()) {
-            makeAndPushNotificationForMP()
+            /*Une fois que toutes les requêtes sont terminées on affiche une notif.*/
+            if (listOfCurrentRequests.isEmpty()) {
+                makeAndPushNotificationForMP()
+            }
         }
     }
 
@@ -99,14 +102,17 @@ class MainActivity : AbsNavigationViewActivity() {
     override fun onPause() {
         val iterator: MutableListIterator<GetNumberOfMPForAccount> = listOfCurrentRequests.listIterator()
         while (iterator.hasNext()) {
-            iterator.next().cancel(true)
+            val currentRequest: GetNumberOfMPForAccount = iterator.next()
+            currentRequest.numberOfMPListener = null
+            currentRequest.cancel(false)
             iterator.remove()
         }
         super.onPause()
     }
 
-    /*TODO: Changer la manière dont l'AsyncTask est géré (plus de inner).*/
-    private inner class GetNumberOfMPForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
+    private class GetNumberOfMPForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
+        var numberOfMPListener: NewNumberOfMPListener? = null
+
         override fun doInBackground(vararg p0: Void?): String? {
             val currentWebInfos = WebManager.WebInfos()
             val pageContent: String?
@@ -125,7 +131,11 @@ class MainActivity : AbsNavigationViewActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            newNumberOfMPReceived(nickname, result, this)
+            numberOfMPListener?.newNumberOfMPReceived(nickname, result, this)
+        }
+
+        interface NewNumberOfMPListener {
+            fun newNumberOfMPReceived(nicknameOfAccount: String, numberOfMP: String?, getter: GetNumberOfMPForAccount)
         }
     }
 }
