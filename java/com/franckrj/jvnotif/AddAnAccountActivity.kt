@@ -38,7 +38,9 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
                     Toast.makeText(this@AddAnAccountActivity, R.string.connectionSuccessful, Toast.LENGTH_SHORT).show()
 
-                    super@AddAnAccountActivity.onBackPressed()
+                    BootReceiver.enableBootReceiverAndInitAlarm(this@AddAnAccountActivity)
+
+                    finish()
                     return
                 }
             } else {
