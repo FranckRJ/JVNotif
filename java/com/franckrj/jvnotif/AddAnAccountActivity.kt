@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.franckrj.jvnotif.base.AbsHomeIsBackActivity
 import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.Undeprecator
 
 class AddAnAccountActivity : AbsHomeIsBackActivity() {
@@ -38,7 +39,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
                     Toast.makeText(this@AddAnAccountActivity, R.string.connectionSuccessful, Toast.LENGTH_SHORT).show()
 
-                    BootReceiver.enableBootReceiverAndInitAlarm(this@AddAnAccountActivity)
+                    InitShedulesManager.initThingsAfterConnect(this@AddAnAccountActivity)
 
                     finish()
                     return

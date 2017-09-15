@@ -31,7 +31,7 @@
             android:label="@string/addAnAccount"/>
 
         <receiver
-            android:name=".BootReceiver"
+            android:name=".InitAlarmBootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -40,6 +40,10 @@
 
         <service
             android:name=".FetchNotifService"/>
+
+        <service
+            android:name=".FetchNotifJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
     </application>
 </manifest>

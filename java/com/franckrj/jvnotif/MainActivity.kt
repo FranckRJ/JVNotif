@@ -6,6 +6,8 @@ import android.view.View
 import android.widget.Button
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.utils.FetchNotifTool
+import com.franckrj.jvnotif.utils.InitShedulesManager
 
 class MainActivity : AbsNavigationViewActivity() {
     init {
@@ -16,7 +18,7 @@ class MainActivity : AbsNavigationViewActivity() {
     private val checkNotifClickedListener = object : View.OnClickListener {
         override fun onClick(view: View?) {
             val fetchNotifIntent: Intent = Intent(this@MainActivity, FetchNotifService::class.java)
-            fetchNotifIntent.putExtra(FetchNotifService.EXTRA_SHOW_TOAST, true)
+            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_SHOW_TOAST, true)
             startService(fetchNotifIntent)
         }
     }
@@ -37,7 +39,7 @@ class MainActivity : AbsNavigationViewActivity() {
         checkNotifButton.setOnClickListener(checkNotifClickedListener)
 
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            FetchNotifService.initAlarm(applicationContext)
+            InitShedulesManager.initThingsAfterLaunch(this)
         }
     }
 }

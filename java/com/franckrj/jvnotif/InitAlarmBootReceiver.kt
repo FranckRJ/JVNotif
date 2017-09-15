@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 
-class BootReceiver : BroadcastReceiver() {
+class InitAlarmBootReceiver : BroadcastReceiver() {
     companion object {
         fun enableBootReceiverAndInitAlarm(context: Context) {
             val receiver: ComponentName = ComponentName(context, BroadcastReceiver::class.java)
