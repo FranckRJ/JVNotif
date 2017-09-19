@@ -49,10 +49,28 @@ class FetchNotifTool(val context: Context) {
         text = context.getString(R.string.accountsWithNewMP, text)
 
         if (totalNumberOfMP > 0) {
-            val title: String = context.getString(R.string.newNumberOfMP, totalNumberOfMP.toString())
+            var oldNumberOfMP: Int = 0
 
-            NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
+            if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                oldNumberOfMP = PrefsManager.getInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED)
+            }
+
+            if (totalNumberOfMP > oldNumberOfMP) {
+                val title: String = context.getString(R.string.newNumberOfMP, totalNumberOfMP.toString())
+
+                NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
+                PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, totalNumberOfMP)
+                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
+                PrefsManager.applyChanges()
+            }
         } else {
+            if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, context)
+                PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, -1)
+                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, false)
+                PrefsManager.applyChanges()
+            }
+
             showShortToast(R.string.noNewMP)
         }
     }
