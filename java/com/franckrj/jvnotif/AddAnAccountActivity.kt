@@ -39,7 +39,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
                     Toast.makeText(this@AddAnAccountActivity, R.string.connectionSuccessful, Toast.LENGTH_SHORT).show()
 
-                    InitShedulesManager.initThingsAfterConnect(this@AddAnAccountActivity)
+                    InitShedulesManager.initSchedulerAndReceiver(this@AddAnAccountActivity)
 
                     finish()
                     return

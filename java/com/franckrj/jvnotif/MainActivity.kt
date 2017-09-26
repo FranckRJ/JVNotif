@@ -39,7 +39,7 @@ class MainActivity : AbsNavigationViewActivity() {
         checkNotifButton.setOnClickListener(checkNotifClickedListener)
 
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            InitShedulesManager.initThingsAfterLaunch(this)
+            InitShedulesManager.initSchedulerAndReceiver(this)
         }
     }
 }
