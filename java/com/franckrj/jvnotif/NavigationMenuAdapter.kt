@@ -38,6 +38,13 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
         return -1
     }
 
+    fun getTextOfRow(position: Int): String {
+        if (position < listOfMenuItem.size) {
+            return listOfMenuItem[position].textContent
+        }
+        return ""
+    }
+
     fun getPositionDependingOfID(itemID: Int, groupID: Int): Int {
         if (itemID != -1) {
             for (i in listOfMenuItem.indices) {

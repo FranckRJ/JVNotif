@@ -31,6 +31,7 @@ object AccountsManager {
         val minSizeOfList = minOf(listOfAccountsNames.size, listOfAccountsCookies.size)
 
         accountsList.clear()
+        @Suppress("LoopToCallChain")
         for (i: Int in 0 until minSizeOfList) {
             accountsList.add(AccountInfos(listOfAccountsNames[i], listOfAccountsCookies[i]))
         }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_open_in_external_browser_webnavigator"
+        android:title="@string/openInExternalBrowser"/>
+    <item
+        android:id="@+id/action_copy_url_webnavigator"
+        android:title="@string/copyUrl"/>
+    <item
+        android:id="@+id/action_reload_page_webnavigator"
+        android:title="@string/refresh"/>
+</menu>

@@ -21,4 +21,8 @@
     <string name="newNumberOfMP">%1$s nouveau(x) MP</string>
     <string name="noNewMP">Pas de nouveaux MP</string>
     <string name="connectToZeroAccount">Vous n\'êtes connecté à aucun compte</string>
+    <string name="copyDone">Copie effectuée</string>
+    <string name="openInExternalBrowser">Ouvrir dans le navigateur externe</string>
+    <string name="copyUrl">Copier l\'URL</string>
+    <string name="refresh">Rafraichir</string>
 </resources>

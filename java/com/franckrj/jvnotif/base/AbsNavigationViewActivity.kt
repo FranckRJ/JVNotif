@@ -16,16 +16,15 @@ import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView
 import com.franckrj.jvnotif.R
 import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.WebNavigatorActivity
 
-/*TODO: Le drawer à du mal à s'ouvrir des fois, visiblement c'est à cause de la vue derrière
-* si la vue en background est une listview il y a pas de problème (normalement) mais avec un
-* bouton ou textview il y en a.*/
 abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     /*TODO: Essayer de passer ces variables en static, pour le moment c'est bugé.*/
     protected val GROUP_ID_BASIC: Int = 0
     protected val GROUP_ID_ACCOUNT: Int = 1
     protected val ITEM_ID_HOME: Int = 0
     protected val ITEM_ID_ADD_ACCOUNT: Int = 1
+    protected val ITEM_ID_SELECT_ACCOUNT: Int = 2
 
     protected val listOfMenuItem: ArrayList<NavigationMenuAdapter.MenuItemInfo> = ArrayList()
     protected var layoutForDrawer: DrawerLayout? = null
@@ -33,6 +32,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     protected var adapterForNavigationMenu: NavigationMenuAdapter? = null
     protected var toggleForDrawer: ActionBarDrawerToggle? = null
     protected var lastItemSelected: Int = -1
+    protected var lastAccountNameSelected: String = ""
     /*Id de l'activité de base à highlight par défaut dans le drawer.*/
     protected var idOfBaseActivity: Int = -1
     protected var updateMenuOnNextOnResume: Boolean = false
@@ -40,7 +40,13 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     @Suppress("ObjectLiteralToLambda")
     protected val itemInNavigationClickedListener = object : AdapterView.OnItemClickListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            lastItemSelected = (adapterForNavigationMenu?.getItemIDOfRow(id.toInt()) ?: -1)
+            if ((adapterForNavigationMenu?.getGroupIDOfRow(id.toInt()) ?: -1) == GROUP_ID_ACCOUNT) {
+                lastItemSelected = ITEM_ID_SELECT_ACCOUNT
+                lastAccountNameSelected = (adapterForNavigationMenu?.getTextOfRow(id.toInt()) ?: "")
+            } else {
+                lastItemSelected = (adapterForNavigationMenu?.getItemIDOfRow(id.toInt()) ?: -1)
+            }
+
             layoutForDrawer?.closeDrawer(GravityCompat.START)
             adapterForNavigationMenu?.rowSelected = id.toInt()
             adapterForNavigationMenu?.notifyDataSetChanged()
@@ -112,6 +118,12 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
                     ITEM_ID_ADD_ACCOUNT -> {
                         startActivity(Intent(this@AbsNavigationViewActivity, AddAnAccountActivity::class.java))
                         updateMenuOnNextOnResume = true
+                    }
+                    ITEM_ID_SELECT_ACCOUNT -> {
+                        val newNavigatorIntent: Intent = Intent(this@AbsNavigationViewActivity, WebNavigatorActivity::class.java)
+                        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, "http://www.jeuxvideo.com/messages-prives/boite-reception.php")
+                        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(lastAccountNameSelected))
+                        startActivity(newNavigatorIntent)
                     }
                 }
 
