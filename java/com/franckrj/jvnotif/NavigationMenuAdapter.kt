@@ -6,23 +6,23 @@ import android.widget.BaseAdapter
 import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
+import android.support.annotation.ColorInt
 import android.support.annotation.DrawableRes
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.franckrj.jvnotif.utils.Undeprecator
 
-/*TODO: les @ColorInt etc ne fonctionnent pas (bug) à ajouter quand ça sera corrigé.*/
 class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter() {
     private var listOfMenuItem: ArrayList<MenuItemInfo> = ArrayList()
     private val serviceInflater: LayoutInflater = (parentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
     var rowSelected: Int = -1
-    /*@ColorInt*/ var selectedItemColor: Int = -1
-    /*@ColorInt*/ var unselectedItemColor: Int = -1
-    /*@ColorInt*/ var selectedBackgroundColor: Int = -1
-    /*@ColorInt*/ var unselectedBackgroundColor: Int = -1
-    /*@ColorInt*/ var normalTextColor: Int = -1
-    /*@ColorInt*/ var headerTextColor: Int = -1
+    @ColorInt var selectedItemColor: Int = -1
+    @ColorInt var unselectedItemColor: Int = -1
+    @ColorInt var selectedBackgroundColor: Int = -1
+    @ColorInt var unselectedBackgroundColor: Int = -1
+    @ColorInt var normalTextColor: Int = -1
+    @ColorInt var headerTextColor: Int = -1
 
     fun getItemIDOfRow(position: Int): Int {
         if (position < listOfMenuItem.size) {

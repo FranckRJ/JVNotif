@@ -19,13 +19,6 @@ import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.WebNavigatorActivity
 
 abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
-    /*TODO: Essayer de passer ces variables en static, pour le moment c'est bugé.*/
-    protected val GROUP_ID_BASIC: Int = 0
-    protected val GROUP_ID_ACCOUNT: Int = 1
-    protected val ITEM_ID_HOME: Int = 0
-    protected val ITEM_ID_ADD_ACCOUNT: Int = 1
-    protected val ITEM_ID_SELECT_ACCOUNT: Int = 2
-
     protected val listOfMenuItem: ArrayList<NavigationMenuAdapter.MenuItemInfo> = ArrayList()
     protected var layoutForDrawer: DrawerLayout? = null
     protected var navigationMenuList: NavigationMenuListView? = null
@@ -36,6 +29,14 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     /*Id de l'activité de base à highlight par défaut dans le drawer.*/
     protected var idOfBaseActivity: Int = -1
     protected var updateMenuOnNextOnResume: Boolean = false
+
+    companion object {
+        val GROUP_ID_BASIC: Int = 0
+        val GROUP_ID_ACCOUNT: Int = 1
+        val ITEM_ID_HOME: Int = 0
+        val ITEM_ID_ADD_ACCOUNT: Int = 1
+        val ITEM_ID_SELECT_ACCOUNT: Int = 2
+    }
 
     @Suppress("ObjectLiteralToLambda")
     protected val itemInNavigationClickedListener = object : AdapterView.OnItemClickListener {
