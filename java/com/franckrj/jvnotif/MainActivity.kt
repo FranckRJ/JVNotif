@@ -50,7 +50,7 @@ class MainActivity : AbsNavigationViewActivity() {
         checkNotifButton.setOnClickListener(checkNotifClickedListener)
 
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            InitShedulesManager.initSchedulerAndReceiver(this)
+            InitShedulesManager.initSchedulers(this)
         }
 
         if (savedInstanceState == null) {

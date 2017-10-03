@@ -2,13 +2,13 @@ package com.franckrj.jvnotif.utils
 
 import android.content.Context
 import android.os.Build
-import com.franckrj.jvnotif.InitAlarmBootReceiver
 import com.franckrj.jvnotif.FetchNotifJobService
+import com.franckrj.jvnotif.FetchNotifService
 
 object InitShedulesManager {
-    fun initSchedulerAndReceiver(context: Context) {
+    fun initSchedulers(context: Context) {
         if (Build.VERSION.SDK_INT < 21) {
-            InitAlarmBootReceiver.enableBootReceiverAndInitAlarm(context)
+            FetchNotifService.initAlarm(context)
         } else {
             FetchNotifJobService.initJobScheduler(context)
         }

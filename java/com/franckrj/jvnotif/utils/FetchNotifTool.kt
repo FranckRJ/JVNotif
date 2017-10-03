@@ -62,6 +62,8 @@ class FetchNotifTool(val context: Context) {
                 PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, totalNumberOfMP)
                 PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
                 PrefsManager.applyChanges()
+            } else {
+                showShortToast(R.string.noNewMP)
             }
         } else {
             if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
