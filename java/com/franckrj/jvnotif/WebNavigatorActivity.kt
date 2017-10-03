@@ -21,8 +21,8 @@ class WebNavigatorActivity : AbsToolbarActivity() {
     private var currentTitle: String = ""
 
     companion object {
-        val EXTRA_URL_LOAD: String = "com.franckrj.respawnirc.webnavigatoractivity.EXTRA_URL_LOAD"
-        val EXTRA_COOKIE_TO_USE: String = "com.franckrj.respawnirc.webnavigatoractivity.EXTRA_COOKIE_TO_USE"
+        val EXTRA_URL_LOAD: String = "com.franckrj.jvnotif.webnavigatoractivity.EXTRA_URL_LOAD"
+        val EXTRA_COOKIE_TO_USE: String = "com.franckrj.jvnotif.webnavigatoractivity.EXTRA_COOKIE_TO_USE"
 
         private val SAVE_TITLE_FOR_NAVIGATOR: String = "saveTitleForNavigator"
         private val SAVE_URL_FOR_NAVIGATOR: String = "saveUrlForNavigator"

@@ -11,6 +11,7 @@ import android.os.Build
 import android.support.annotation.ColorInt
 import android.support.v4.app.NotificationCompat
 import android.support.v4.util.SimpleArrayMap
+import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 
@@ -19,6 +20,7 @@ import com.franckrj.jvnotif.R
 object NotifsManager {
     private val listOfNotifType: SimpleArrayMap<NotifTypeInfo.Names, NotifTypeInfo> = SimpleArrayMap()
 
+    val INVALID_NOTIF_ID: Int = -1
     val MP_NOTIF_ID: Int = 4
 
     fun initializeNotifs(context: Context) {
@@ -32,6 +34,7 @@ object NotifsManager {
                                         longArrayOf(0, 200, 200, 200),
                                         (if (Build.VERSION.SDK_INT >= 16) @Suppress("DEPRECATION") Notification.PRIORITY_HIGH else null),
                                         (if (Build.VERSION.SDK_INT >= 26) NotificationManager.IMPORTANCE_HIGH else 0),
+                                        true,
                                         true)
         listOfNotifType.put(NotifTypeInfo.Names.MP, mpNotifType)
 
@@ -87,6 +90,15 @@ object NotifsManager {
             notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, 0))
         }
 
+        if (notifType.clickToOpenHome) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            intent.putExtra(MainActivity.EXTRA_MP_NOTIF_CANCELED, true)
+
+            notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
+            notificationBuilder.setAutoCancel(true)
+        }
+
         return notificationBuilder.build()
     }
 
@@ -121,7 +133,8 @@ object NotifsManager {
                         val vibratePattern: LongArray = LongArray(0),
                         val priority: Int? = null,
                         val importance: Int = 0,
-                        val broadcastDismiss: Boolean = false) {
+                        val broadcastDismiss: Boolean = false,
+                        val clickToOpenHome: Boolean = false) {
 
         enum class Names {
             MP
