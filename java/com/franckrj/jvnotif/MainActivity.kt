@@ -28,10 +28,12 @@ class MainActivity : AbsNavigationViewActivity() {
         }
     }
 
-    fun consumeIntent(intent: Intent?) {
+    fun consumeIntent(intent: Intent?): Boolean {
         if (intent?.getBooleanExtra(EXTRA_MP_NOTIF_CANCELED, false) == true) {
             NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            return true
         }
+        return false
     }
 
     override fun initializeViewAndToolbar() {
@@ -44,17 +46,18 @@ class MainActivity : AbsNavigationViewActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var openedFromNotif: Boolean = false
 
         val checkNotifButton: Button = findViewById(R.id.checknotif_button_main)
 
         checkNotifButton.setOnClickListener(checkNotifClickedListener)
 
-        if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            InitShedulesManager.initSchedulers(this)
+        if (savedInstanceState == null) {
+            openedFromNotif = consumeIntent(intent)
         }
 
-        if (savedInstanceState == null) {
-            consumeIntent(intent)
+        if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif) {
+            InitShedulesManager.initSchedulers(this)
         }
     }
 
