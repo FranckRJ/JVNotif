@@ -49,14 +49,18 @@ class FetchNotifTool(val context: Context) {
         text = context.getString(R.string.accountsWithNewMP, text)
 
         if (totalNumberOfMP > 0) {
-            var oldNumberOfMP: Int = 0
-
-            if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
-                oldNumberOfMP = PrefsManager.getInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED)
-            }
+            val oldNumberOfMP: Int = if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                                         PrefsManager.getInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED)
+                                     } else {
+                                         0
+                                     }
 
             if (totalNumberOfMP > oldNumberOfMP) {
-                val title: String = context.getString(R.string.newNumberOfMP, totalNumberOfMP.toString())
+                val title: String = if (totalNumberOfMP == 1) {
+                                        context.getString(R.string.newNumberOfMPSingular)
+                                    } else {
+                                        context.getString(R.string.newNumberOfMPPlural, totalNumberOfMP.toString())
+                                    }
 
                 NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
                 PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, totalNumberOfMP)

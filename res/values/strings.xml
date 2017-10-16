@@ -18,7 +18,8 @@
     <string name="mpChannel">MP</string>
     <string name="mpChannelDesc">MP de JVC</string>
     <string name="accountsWithNewMP">Sur %1$s</string>
-    <string name="newNumberOfMP">%1$s nouveau(x) MP</string>
+    <string name="newNumberOfMPSingular">1 nouveau MP</string>
+    <string name="newNumberOfMPPlural">%1$s nouveaux MP</string>
     <string name="noNewMP">Pas de nouveaux MP</string>
     <string name="connectToZeroAccount">Vous n\'êtes connecté à aucun compte</string>
     <string name="copyDone">Copie effectuée</string>
