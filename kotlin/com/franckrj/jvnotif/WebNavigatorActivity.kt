@@ -72,7 +72,7 @@ class WebNavigatorActivity : AbsToolbarActivity() {
             val newUrlToLoad: String? = intent.getStringExtra(EXTRA_URL_LOAD)
             val newCookiesToUse: String? = intent.getStringExtra(EXTRA_COOKIE_TO_USE)
 
-            /*"... != null" pour activer le smartcast.*/
+            /* "... != null" pour activer le smartcast. */
             if (newUrlToLoad != null && !newUrlToLoad.isNullOrEmpty()) {
                 currentUrl = newUrlToLoad
                 tmpWebView.loadUrl(currentUrl)

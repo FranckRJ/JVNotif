@@ -53,7 +53,7 @@ object WebManager {
                 writer.close()
             }
 
-            /*Retourne null si inputStream vaut null.*/
+            /* Retourne null si inputStream vaut null. */
             val inputStream: InputStream = urlConnection.inputStream ?: return null
 
             reader = BufferedReader(InputStreamReader(inputStream))

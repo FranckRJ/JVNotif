@@ -15,8 +15,8 @@ import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 
-/*TODO: Améliorer la personnalisation des notifs (genre le truc de lockscreen etc par ex).*/
-/*TODO: La couleur de la notification n'est pas la bonne.*/
+/* TODO: Améliorer la personnalisation des notifs (genre le truc de lockscreen etc par ex). */
+/* TODO: La couleur de la notification n'est pas la bonne. */
 object NotifsManager {
     private val listOfNotifType: SimpleArrayMap<NotifTypeInfo.Names, NotifTypeInfo> = SimpleArrayMap()
 

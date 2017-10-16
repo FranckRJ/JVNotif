@@ -54,6 +54,12 @@ class MainActivity : AbsNavigationViewActivity() {
 
         if (savedInstanceState == null) {
             openedFromNotif = consumeIntent(intent)
+
+            /* On supprime la notification même si l'application n'est pas ouverte via la notification. */
+            if (!openedFromNotif) {
+                NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this)
+                NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            }
         }
 
         if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif) {

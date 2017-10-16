@@ -24,7 +24,7 @@ class FetchNotifTool(val context: Context) {
             listOfCurrentRequests.remove(getter)
             listOfNumberOfMPPerAccounts.put(nicknameOfAccount, numberOfMP ?: "")
 
-            /*Une fois que toutes les requêtes sont terminées on affiche une notif.*/
+            /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
             if (listOfCurrentRequests.isEmpty()) {
                 makeAndPushNotificationForMP()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
@@ -123,7 +123,7 @@ class FetchNotifTool(val context: Context) {
             val pageContent: String?
 
             currentWebInfos.followRedirects = false
-            /*TODO: Check pour changer le lien de la requête (si besoin).*/
+            /* TODO: Check pour changer le lien de la requête (si besoin). */
             pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/sso/settings.php", "GET", "", cookie, currentWebInfos)
 
             @Suppress("LiftReturnOrAssignment")

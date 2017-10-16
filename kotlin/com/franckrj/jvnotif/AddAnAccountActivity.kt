@@ -23,7 +23,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
     private val saveCookies: View.OnClickListener = object : View.OnClickListener {
         override fun onClick(view: View?) {
             if (nicknameText != null && nicknameText?.text.toString().isNotEmpty()) {
-                /*Récupération du cookie "coniunctio", de manière un peu compliquée mais qui fonctionne.*/
+                /* Récupération du cookie "coniunctio", de manière un peu compliquée mais qui fonctionne. */
                 val allCookiesInstring: String = CookieManager.getInstance().getCookie("http://www.jeuxvideo.com/")
                 val allCookiesInStringArray: Array<String> = TextUtils.split(allCookiesInstring, ";")
 
@@ -32,7 +32,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
                         .firstOrNull { it.size > 1 && it[0] == "coniunctio" }
                         ?.let { it[1] }
 
-                /*"connectCookieValue != null" pour activer le smartcast.*/
+                /* "connectCookieValue != null" pour activer le smartcast. */
                 if (connectCookieValue != null && !connectCookieValue.isNullOrEmpty()) {
                     AccountsManager.addAccount(nicknameText?.text.toString().trim(), connectCookieValue)
                     AccountsManager.saveListOfAccounts()
@@ -65,8 +65,8 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
         endActionButton.setOnClickListener(saveCookies)
 
-        /*Suppression de tout ce qui s'apparente de près ou de loin à un cache, des cookies etc etc
-        * pour que la nouvelle connexion puisse se faire sans problèmes.*/
+        /* Suppression de tout ce qui s'apparente de près ou de loin à un cache, des cookies etc etc
+         * pour que la nouvelle connexion puisse se faire sans problèmes. */
         Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
         jvcWebView.webViewClient = WebViewClient()
         jvcWebView.webChromeClient = WebChromeClient()
