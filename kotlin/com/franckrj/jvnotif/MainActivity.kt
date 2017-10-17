@@ -28,6 +28,8 @@ class MainActivity : AbsNavigationViewActivity() {
 
     companion object {
         val EXTRA_MP_NOTIF_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_MP_NOTIF_CANCELED"
+
+        var isTheActiveActivity: Boolean = false
     }
 
     init {
@@ -85,7 +87,6 @@ class MainActivity : AbsNavigationViewActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var openedFromNotif: Boolean = false
 
         val accountWithMpList: RecyclerView = findViewById(R.id.accountwithmp_list_main)
         checkNotifButton = findViewById(R.id.checknotif_button_main)
@@ -97,14 +98,14 @@ class MainActivity : AbsNavigationViewActivity() {
         checkNotifButton?.setOnClickListener(checkNotifClickedListener)
 
         if (savedInstanceState == null) {
+            val openedFromNotif: Boolean = consumeIntent(intent)
             val fetchNotifIntent = Intent(this, FetchNotifService::class.java)
-            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, true)
 
-            openedFromNotif = consumeIntent(intent)
+            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, true)
             startService(fetchNotifIntent)
 
             /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si la notif
-             * était visible, pour éviter de la ré-afficher juste après qu'elle soit effacée. */
+             * était visible, parce que dans ce cas ils étaient forcément déjà initialisés. */
             if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
                     !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
                 InitShedulesManager.initSchedulers(this)
@@ -114,6 +115,7 @@ class MainActivity : AbsNavigationViewActivity() {
 
     override fun onResume() {
         super.onResume()
+        isTheActiveActivity = true
 
         LocalBroadcastManager.getInstance(this)
                              .registerReceiver(numberOfMpUpdatedReceiver, IntentFilter(FetchNotifTool.ACTION_MP_NUMBER_UPDATED))
@@ -124,6 +126,7 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     override fun onPause() {
+        isTheActiveActivity = false
         LocalBroadcastManager.getInstance(this).unregisterReceiver(numberOfMpUpdatedReceiver)
         super.onPause()
     }

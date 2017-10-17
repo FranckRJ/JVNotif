@@ -7,6 +7,7 @@ import android.support.annotation.StringRes
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.util.SimpleArrayMap
 import android.widget.Toast
+import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.R
 
 class FetchNotifTool(val context: Context) {
@@ -55,7 +56,7 @@ class FetchNotifTool(val context: Context) {
                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
              * mais comme la notif a été effacée on l'affiche de nouveau. */
-            if (!onlyUpdateAndDontShowNotif) {
+            if (!onlyUpdateAndDontShowNotif && !MainActivity.isTheActiveActivity) {
                 val totalNumberOfMp: Int = AccountsManager.getNumberOfMpForAllAccounts()
                 val title: String = if (totalNumberOfMp == 1) {
                     context.getString(R.string.newNumberOfMpSingular)

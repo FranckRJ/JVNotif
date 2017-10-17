@@ -30,11 +30,11 @@ object WebManager {
             urlConnection.instanceFollowRedirects = currentInfos.followRedirects
 
             if (currentInfos.useBiggerTimeoutTime) {
+                urlConnection.connectTimeout = 20000
+                urlConnection.readTimeout = 20000
+            } else {
                 urlConnection.connectTimeout = 10000
                 urlConnection.readTimeout = 10000
-            } else {
-                urlConnection.connectTimeout = 5000
-                urlConnection.readTimeout = 5000
             }
 
             urlConnection.requestMethod = requestMethod
