@@ -14,8 +14,10 @@ import android.content.Intent
 import com.franckrj.jvnotif.AddAnAccountActivity
 import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView
+import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.utils.NotifsManager
 import com.franckrj.jvnotif.WebNavigatorActivity
 
 abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
@@ -124,6 +126,15 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
                         val newNavigatorIntent = Intent(this@AbsNavigationViewActivity, WebNavigatorActivity::class.java)
                         newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, "http://www.jeuxvideo.com/messages-prives/boite-reception.php")
                         newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(lastAccountNameSelected))
+
+                        AccountsManager.setNumberOfMp(lastAccountNameSelected, 0)
+                        AccountsManager.saveNumberOfMp()
+
+                        if (AccountsManager.thereIsNoMp()) {
+                            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
+                            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+                        }
+
                         startActivity(newNavigatorIntent)
                     }
                 }

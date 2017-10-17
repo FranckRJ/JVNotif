@@ -5,11 +5,12 @@ import android.os.AsyncTask
 import android.support.annotation.StringRes
 import android.support.v4.util.SimpleArrayMap
 import android.widget.Toast
+import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 
 class FetchNotifTool(val context: Context) {
-    private val listOfCurrentRequests: ArrayList<GetNumberOfMPForAccount> = ArrayList()
-    private val listOfNumberOfMPPerAccounts: SimpleArrayMap<String, String> = SimpleArrayMap()
+    private val listOfCurrentRequests: ArrayList<GetNumberOfMpForAccount> = ArrayList()
+    private val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, String> = SimpleArrayMap()
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
     var showToasts: Boolean = false
 
@@ -19,66 +20,54 @@ class FetchNotifTool(val context: Context) {
         val EXTRA_SHOW_TOAST: String = "EXTRA_SHOW_TOAST"
     }
 
-    private val newNumberOfMPReceivedListener = object : GetNumberOfMPForAccount.NewNumberOfMPReceived {
-        override fun onReceiveNewNumberOfMP(nicknameOfAccount: String, numberOfMP: String?, getter: GetNumberOfMPForAccount) {
+    private val newNumberOfMpReceivedListener = object : GetNumberOfMpForAccount.NewNumberOfMpReceived {
+        override fun onReceiveNewNumberOfMp(nicknameOfAccount: String, numberOfMp: String?, getter: GetNumberOfMpForAccount) {
             listOfCurrentRequests.remove(getter)
-            listOfNumberOfMPPerAccounts.put(nicknameOfAccount, numberOfMP ?: "")
+            listOfNumberOfMpPerAccounts.put(nicknameOfAccount, numberOfMp ?: "")
 
             /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
             if (listOfCurrentRequests.isEmpty()) {
-                makeAndPushNotificationForMP()
+                makeAndPushNotificationForMp()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
             }
         }
     }
 
-    private fun makeAndPushNotificationForMP() {
-        var totalNumberOfMP: Int = 0
-        var text: String = ""
+    private fun makeAndPushNotificationForMp() {
+        AccountsManager.clearNumberOfMpForAllAccounts()
+        for (i: Int in 0 until listOfNumberOfMpPerAccounts.size()) {
+            val currentNumberOfMp: Int = (listOfNumberOfMpPerAccounts.valueAt(i).toIntOrNull() ?: 0)
 
-        for (i in 0 until listOfNumberOfMPPerAccounts.size()) {
-            val currentNumberOfMP: Int = (listOfNumberOfMPPerAccounts.valueAt(i).toIntOrNull() ?: 0)
-
-            totalNumberOfMP += currentNumberOfMP
-            if (currentNumberOfMP > 0) {
-                text += listOfNumberOfMPPerAccounts.keyAt(i) + ", "
-            }
+            AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), currentNumberOfMp)
         }
 
-        text = text.removeSuffix(", ")
-        text = context.getString(R.string.accountsWithNewMP, text)
+        if (AccountsManager.thereIsNoMp()) {
+            /* Aucun mp non lu. */
+            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, context)
+            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
 
-        if (totalNumberOfMP > 0) {
-            val oldNumberOfMP: Int = if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
-                                         PrefsManager.getInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED)
-                                     } else {
-                                         0
-                                     }
+            showShortToast(R.string.noNewMp)
+        } else if (AccountsManager.thereIsNewMpSinceLastSavedInfos() ||
+                   !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+            /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
+             * mais comme la notif a été effacée on l'affiche de nouveau. */
+            val totalNumberOfMp: Int = AccountsManager.getNumberOfMpForAllAccounts()
+            val title: String = if (totalNumberOfMp == 1) {
+                                    context.getString(R.string.newNumberOfMpSingular)
+                                } else {
+                                    context.getString(R.string.newNumberOfMpPlural, totalNumberOfMp.toString())
+                                }
+            val text: String = context.getString(R.string.accountsWithNewMp, AccountsManager.getAllNicknamesThatHaveMp())
 
-            if (totalNumberOfMP > oldNumberOfMP) {
-                val title: String = if (totalNumberOfMP == 1) {
-                                        context.getString(R.string.newNumberOfMPSingular)
-                                    } else {
-                                        context.getString(R.string.newNumberOfMPPlural, totalNumberOfMP.toString())
-                                    }
-
-                NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
-                PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, totalNumberOfMP)
-                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
-                PrefsManager.applyChanges()
-            } else {
-                showShortToast(R.string.noNewMP)
-            }
+            NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
+            PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
+            PrefsManager.applyChanges()
         } else {
-            if (PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
-                NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, context)
-                PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, -1)
-                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, false)
-                PrefsManager.applyChanges()
-            }
-
-            showShortToast(R.string.noNewMP)
+            /* Il y a des mp non lu mais ils correspondent à la notification déjà affichée. */
+            showShortToast(R.string.noNewMp)
         }
+
+        AccountsManager.saveNumberOfMp()
     }
 
     private fun showShortToast(@StringRes textID: Int) {
@@ -91,14 +80,14 @@ class FetchNotifTool(val context: Context) {
         if (listOfCurrentRequests.isEmpty()) {
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
-            listOfNumberOfMPPerAccounts.clear()
+            listOfNumberOfMpPerAccounts.clear()
 
             if (listOfAccounts.isNotEmpty()) {
                 for (account in listOfAccounts) {
-                    val newRequest = GetNumberOfMPForAccount(account.nickname, account.cookie)
+                    val newRequest = GetNumberOfMpForAccount(account.nickname, account.cookie)
 
                     listOfCurrentRequests.add(newRequest)
-                    newRequest.numberOfMPListener = newNumberOfMPReceivedListener
+                    newRequest.numberOfMpListener = newNumberOfMpReceivedListener
                     newRequest.execute()
                 }
             } else {
@@ -110,17 +99,17 @@ class FetchNotifTool(val context: Context) {
     }
 
     fun stopFetchNotif() {
-        val iterator: MutableListIterator<GetNumberOfMPForAccount> = listOfCurrentRequests.listIterator()
+        val iterator: MutableListIterator<GetNumberOfMpForAccount> = listOfCurrentRequests.listIterator()
         while (iterator.hasNext()) {
-            val currentRequest: GetNumberOfMPForAccount = iterator.next()
-            currentRequest.numberOfMPListener = null
+            val currentRequest: GetNumberOfMpForAccount = iterator.next()
+            currentRequest.numberOfMpListener = null
             currentRequest.cancel(false)
             iterator.remove()
         }
     }
 
-    private class GetNumberOfMPForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
-        var numberOfMPListener: NewNumberOfMPReceived? = null
+    private class GetNumberOfMpForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
+        var numberOfMpListener: NewNumberOfMpReceived? = null
 
         override fun doInBackground(vararg p0: Void?): String? {
             val currentWebInfos = WebManager.WebInfos()
@@ -132,7 +121,7 @@ class FetchNotifTool(val context: Context) {
 
             @Suppress("LiftReturnOrAssignment")
             if (pageContent != null) {
-                return JVCParser.getNumberOfMPFromPage(pageContent)
+                return JVCParser.getNumberOfMpFromPage(pageContent)
             } else {
                 return null
             }
@@ -140,11 +129,11 @@ class FetchNotifTool(val context: Context) {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            numberOfMPListener?.onReceiveNewNumberOfMP(nickname, result, this)
+            numberOfMpListener?.onReceiveNewNumberOfMp(nickname, result, this)
         }
 
-        interface NewNumberOfMPReceived {
-            fun onReceiveNewNumberOfMP(nicknameOfAccount: String, numberOfMP: String?, getter: GetNumberOfMPForAccount)
+        interface NewNumberOfMpReceived {
+            fun onReceiveNewNumberOfMp(nicknameOfAccount: String, numberOfMp: String?, getter: GetNumberOfMpForAccount)
         }
     }
 

@@ -12,7 +12,6 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
 
         fun onNotifDismissed(notifID: Int) {
             if (notifID == NotifsManager.MP_NOTIF_ID) {
-                PrefsManager.putInt(PrefsManager.IntPref.Names.LAST_NUMBER_OF_MP_FETCHED, -1)
                 PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, false)
                 PrefsManager.applyChanges()
             }

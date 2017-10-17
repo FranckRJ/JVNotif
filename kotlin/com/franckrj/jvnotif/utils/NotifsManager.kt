@@ -40,7 +40,7 @@ object NotifsManager {
 
         if (Build.VERSION.SDK_INT >= 26) {
             val notificationService: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            for (i in 0 until listOfNotifType.size()) {
+            for (i: Int in 0 until listOfNotifType.size()) {
                 val newNotifType: NotifTypeInfo = listOfNotifType.valueAt(i)
                 val newChannel = NotificationChannel(newNotifType.channelID, newNotifType.channelName, newNotifType.importance)
 

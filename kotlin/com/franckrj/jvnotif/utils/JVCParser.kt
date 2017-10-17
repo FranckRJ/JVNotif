@@ -3,10 +3,10 @@ package com.franckrj.jvnotif.utils
 import java.util.regex.Pattern
 
 object JVCParser {
-    private val numberOfMPJVCPattern = Pattern.compile("""<div class=".*?account-mp.*?">[^<]*<span[^c]*class="account-number-mp[^"]*".*?data-val="([^"]*)"""", Pattern.DOTALL)
+    private val numberOfMpJVCPattern = Pattern.compile("""<div class=".*?account-mp.*?">[^<]*<span[^c]*class="account-number-mp[^"]*".*?data-val="([^"]*)"""", Pattern.DOTALL)
 
-    fun getNumberOfMPFromPage(pageSource: String): String {
-        val numberOfMpJVCMatcher = numberOfMPJVCPattern.matcher(pageSource)
+    fun getNumberOfMpFromPage(pageSource: String): String {
+        val numberOfMpJVCMatcher = numberOfMpJVCPattern.matcher(pageSource)
 
         @Suppress("LiftReturnOrAssignment")
         if (numberOfMpJVCMatcher.find()) {

@@ -47,7 +47,7 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
 
     fun getPositionDependingOfID(itemID: Int, groupID: Int): Int {
         if (itemID != -1) {
-            for (i in listOfMenuItem.indices) {
+            for (i: Int in listOfMenuItem.indices) {
                 val currentItemInfo: MenuItemInfo = listOfMenuItem[i]
                 if (currentItemInfo.itemID == itemID && (groupID == -1 || currentItemInfo.groupID == groupID)) {
                     return i
