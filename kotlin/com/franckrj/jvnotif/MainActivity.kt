@@ -1,9 +1,12 @@
 package com.franckrj.jvnotif
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -35,6 +38,8 @@ class MainActivity : AbsNavigationViewActivity() {
         override fun onClick(view: View?) {
             val fetchNotifIntent = Intent(this@MainActivity, FetchNotifService::class.java)
             fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_SHOW_TOAST, true)
+            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, true)
+            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_LAUNCH_INTENT_WHEN_FINISHED, true)
             startService(fetchNotifIntent)
         }
     }
@@ -42,6 +47,22 @@ class MainActivity : AbsNavigationViewActivity() {
     private val accountClickedListener = object : AccountListAdapter.AccountViewHolder.ItemClickedListener {
         override fun onItemClickedListener(nicknameOfItem: String) {
             openMpPageForThisNickname(nicknameOfItem)
+        }
+    }
+
+    private val numberOfMpUpdatedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            updateAccountWithMpList()
+        }
+    }
+
+    private fun updateAccountWithMpList() {
+        adapterForAccountWithMp?.listOfAccounts = AccountsManager.getListOfAccounts().filter { it.numberOfMp > 0 }
+
+        if ((adapterForAccountWithMp?.itemCount ?: 0) > 0) {
+            checkNotifButton?.visibility = View.GONE
+        } else {
+            checkNotifButton?.visibility = View.VISIBLE
         }
     }
 
@@ -91,14 +112,14 @@ class MainActivity : AbsNavigationViewActivity() {
 
     override fun onResume() {
         super.onResume()
+        updateAccountWithMpList()
+        LocalBroadcastManager.getInstance(this)
+                             .registerReceiver(numberOfMpUpdatedReceiver, IntentFilter(FetchNotifTool.ACTION_MP_NUMBER_UPDATED))
+    }
 
-        adapterForAccountWithMp?.listOfAccounts = AccountsManager.getListOfAccounts().filter { it.numberOfMp > 0 }
-
-        if ((adapterForAccountWithMp?.itemCount ?: 0) > 0) {
-            checkNotifButton?.visibility = View.GONE
-        } else {
-            checkNotifButton?.visibility = View.VISIBLE
-        }
+    override fun onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(numberOfMpUpdatedReceiver)
+        super.onPause()
     }
 
     override fun onNewIntent(intent: Intent?) {

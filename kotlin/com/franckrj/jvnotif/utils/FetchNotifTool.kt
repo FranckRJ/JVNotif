@@ -1,8 +1,10 @@
 package com.franckrj.jvnotif.utils
 
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.support.annotation.StringRes
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.util.SimpleArrayMap
 import android.widget.Toast
 import com.franckrj.jvnotif.NotificationDismissedReceiver
@@ -13,11 +15,16 @@ class FetchNotifTool(val context: Context) {
     private val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, String> = SimpleArrayMap()
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
     var showToasts: Boolean = false
+    var onlyUpdateAndDontShowNotif: Boolean = false
+    var launchIntentWhenFinished: Boolean = false
 
     companion object {
         val wakeLockTimeout: Long = 300000
         val repeatTime: Long = 1800000
         val EXTRA_SHOW_TOAST: String = "EXTRA_SHOW_TOAST"
+        val EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF: String = "EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF"
+        val EXTRA_LAUNCH_INTENT_WHEN_FINISHED: String = "EXTRA_LAUNCH_INTENT_WHEN_FINISHED"
+        val ACTION_MP_NUMBER_UPDATED: String = "ACTION_MP_NUMBER_UPDATED"
     }
 
     private val newNumberOfMpReceivedListener = object : GetNumberOfMpForAccount.NewNumberOfMpReceived {
@@ -27,13 +34,17 @@ class FetchNotifTool(val context: Context) {
 
             /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
             if (listOfCurrentRequests.isEmpty()) {
-                makeAndPushNotificationForMp()
+                updateMpNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
+
+                if (launchIntentWhenFinished) {
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_MP_NUMBER_UPDATED))
+                }
             }
         }
     }
 
-    private fun makeAndPushNotificationForMp() {
+    private fun updateMpNumberOfAccountsAndShowThingsIfNeeded() {
         AccountsManager.clearNumberOfMpForAllAccounts()
         for (i: Int in 0 until listOfNumberOfMpPerAccounts.size()) {
             val currentNumberOfMp: Int = (listOfNumberOfMpPerAccounts.valueAt(i).toIntOrNull() ?: 0)
@@ -51,17 +62,19 @@ class FetchNotifTool(val context: Context) {
                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
              * mais comme la notif a été effacée on l'affiche de nouveau. */
-            val totalNumberOfMp: Int = AccountsManager.getNumberOfMpForAllAccounts()
-            val title: String = if (totalNumberOfMp == 1) {
-                                    context.getString(R.string.newNumberOfMpSingular)
-                                } else {
-                                    context.getString(R.string.newNumberOfMpPlural, totalNumberOfMp.toString())
-                                }
-            val text: String = context.getString(R.string.accountsWithNewMp, AccountsManager.getAllNicknamesThatHaveMp())
+            if (!onlyUpdateAndDontShowNotif) {
+                val totalNumberOfMp: Int = AccountsManager.getNumberOfMpForAllAccounts()
+                val title: String = if (totalNumberOfMp == 1) {
+                    context.getString(R.string.newNumberOfMpSingular)
+                } else {
+                    context.getString(R.string.newNumberOfMpPlural, totalNumberOfMp.toString())
+                }
+                val text: String = context.getString(R.string.accountsWithNewMp, AccountsManager.getAllNicknamesThatHaveMp())
 
-            NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
-            PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
-            PrefsManager.applyChanges()
+                NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
+                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
+                PrefsManager.applyChanges()
+            }
         } else {
             /* Il y a des mp non lu mais ils correspondent à la notification déjà affichée. */
             showShortToast(R.string.noNewMp)

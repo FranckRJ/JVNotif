@@ -48,7 +48,12 @@ class FetchNotifService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        toolForFetchNotif.showToasts = (intent?.getBooleanExtra(FetchNotifTool.EXTRA_SHOW_TOAST, false) ?: false)
+        toolForFetchNotif.showToasts =
+                (intent?.getBooleanExtra(FetchNotifTool.EXTRA_SHOW_TOAST, false) ?: false)
+        toolForFetchNotif.onlyUpdateAndDontShowNotif =
+                (intent?.getBooleanExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, false) ?: false)
+        toolForFetchNotif.launchIntentWhenFinished =
+                (intent?.getBooleanExtra(FetchNotifTool.EXTRA_LAUNCH_INTENT_WHEN_FINISHED, false) ?: false)
 
         toolForFetchNotif.startFetchNotif()
 
