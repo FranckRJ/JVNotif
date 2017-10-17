@@ -109,7 +109,9 @@ object AccountsManager {
         accountsList.clear()
         @Suppress("LoopToCallChain")
         for (i: Int in listOfAccountsNames.indices) {
-            accountsList.add(AccountInfos(listOfAccountsNames[i], listOfAccountsCookies[i]))
+            if (listOfAccountsNames[i].isNotEmpty()) {
+                accountsList.add(AccountInfos(listOfAccountsNames[i], listOfAccountsCookies[i]))
+            }
         }
 
         loadNumberOfMp()
