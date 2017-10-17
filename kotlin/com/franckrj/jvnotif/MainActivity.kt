@@ -20,6 +20,7 @@ import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.FetchNotifTool
 import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
+import com.franckrj.jvnotif.utils.PrefsManager
 
 class MainActivity : AbsNavigationViewActivity() {
     private var checkNotifButton: Button? = null
@@ -99,7 +100,10 @@ class MainActivity : AbsNavigationViewActivity() {
             openedFromNotif = consumeIntent(intent)
         }
 
-        if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif) {
+        /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si la notif
+         * était visible, pour éviter de la ré-afficher juste après qu'elle soit effacée. */
+        if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
+                !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             InitShedulesManager.initSchedulers(this)
         }
     }
