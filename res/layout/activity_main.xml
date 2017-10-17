@@ -10,11 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Solution bizarre pour que le drawer s'ouvre sans problème,
-             sans ça il s'accroche au bord de l'écran et fait que s'entrouvrir -->
-        <ListView
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/accountwithmp_list_main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar_main"
+            android:scrollbars="vertical"/>
 
         <Button
             android:id="@+id/checknotif_button_main"

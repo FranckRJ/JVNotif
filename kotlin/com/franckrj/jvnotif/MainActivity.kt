@@ -1,9 +1,17 @@
 package com.franckrj.jvnotif
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.FetchNotifTool
@@ -11,6 +19,9 @@ import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 
 class MainActivity : AbsNavigationViewActivity() {
+    private var checkNotifButton: Button? = null
+    private var adapterForAccountWithMp: AccountListAdapter? = null
+
     companion object {
         val EXTRA_MP_NOTIF_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_MP_NOTIF_CANCELED"
     }
@@ -25,6 +36,12 @@ class MainActivity : AbsNavigationViewActivity() {
             val fetchNotifIntent = Intent(this@MainActivity, FetchNotifService::class.java)
             fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_SHOW_TOAST, true)
             startService(fetchNotifIntent)
+        }
+    }
+
+    private val accountClickedListener = object : AccountListAdapter.AccountViewHolder.ItemClickedListener {
+        override fun onItemClickedListener(nicknameOfItem: String) {
+            openMpPageForThisNickname(nicknameOfItem)
         }
     }
 
@@ -48,9 +65,14 @@ class MainActivity : AbsNavigationViewActivity() {
         super.onCreate(savedInstanceState)
         var openedFromNotif: Boolean = false
 
-        val checkNotifButton: Button = findViewById(R.id.checknotif_button_main)
+        val accountWithMpList: RecyclerView = findViewById(R.id.accountwithmp_list_main)
+        checkNotifButton = findViewById(R.id.checknotif_button_main)
 
-        checkNotifButton.setOnClickListener(checkNotifClickedListener)
+        adapterForAccountWithMp = AccountListAdapter(this)
+        adapterForAccountWithMp?.onItemClickedListener = accountClickedListener
+        accountWithMpList.layoutManager = LinearLayoutManager(this)
+        accountWithMpList.adapter = adapterForAccountWithMp
+        checkNotifButton?.setOnClickListener(checkNotifClickedListener)
 
         if (savedInstanceState == null) {
             openedFromNotif = consumeIntent(intent)
@@ -67,8 +89,65 @@ class MainActivity : AbsNavigationViewActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        adapterForAccountWithMp?.listOfAccounts = AccountsManager.getListOfAccounts().filter { it.numberOfMp > 0 }
+
+        if ((adapterForAccountWithMp?.itemCount ?: 0) > 0) {
+            checkNotifButton?.visibility = View.GONE
+        } else {
+            checkNotifButton?.visibility = View.VISIBLE
+        }
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         consumeIntent(intent)
+    }
+
+    private class AccountListAdapter(val context: Context) :
+            RecyclerView.Adapter<AccountListAdapter.AccountViewHolder>() {
+        private val serviceInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        var onItemClickedListener: AccountViewHolder.ItemClickedListener? = null
+        var listOfAccounts: List<AccountsManager.AccountInfos> = ArrayList()
+            set(newList) {
+                field = newList
+                notifyDataSetChanged()
+            }
+
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): AccountViewHolder {
+            return AccountViewHolder(serviceInflater.inflate(R.layout.accountwithmp_row, parent, false), onItemClickedListener)
+        }
+
+        override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
+            holder.setInformations(listOfAccounts[position].nickname,
+                                   context.getString(R.string.mpNumber, listOfAccounts[position].numberOfMp.toString()))
+        }
+
+        override fun getItemCount(): Int = listOfAccounts.size
+
+        class AccountViewHolder(mainView: View, onItemClickedListener: ItemClickedListener?) : RecyclerView.ViewHolder(mainView) {
+            private val nicknameView: TextView = mainView.findViewById(R.id.nickname_accountwithmp_row)
+            private val notifView: TextView = mainView.findViewById(R.id.notif_accountwithmp_row)
+
+            init {
+                val image: ImageView = mainView.findViewById(R.id.image_accountwithmp_row)
+                image.setColorFilter(Color.rgb(253, 83, 46))
+
+                mainView.setOnClickListener({
+                    onItemClickedListener?.onItemClickedListener(nicknameView.text.toString())
+                })
+            }
+
+            fun setInformations(newNickname: String, newNotif: String) {
+                nicknameView.text = newNickname
+                notifView.text = newNotif
+            }
+
+            interface ItemClickedListener {
+                fun onItemClickedListener(nicknameOfItem: String)
+            }
+        }
     }
 }

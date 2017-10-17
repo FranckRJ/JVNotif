@@ -28,7 +28,7 @@ object NotifsManager {
                                         MP_NOTIF_ID,
                                         context.getString(R.string.mpChannel),
                                         context.getString(R.string.mpChannelDesc),
-                                        Color.rgb(255, 140, 0),
+                                        Color.rgb(253, 83, 46),
                                         1000,
                                         1000,
                                         longArrayOf(0, 200, 200, 200),

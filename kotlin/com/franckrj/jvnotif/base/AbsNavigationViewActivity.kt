@@ -103,6 +103,22 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         resetSelectRow()
     }
 
+    protected fun openMpPageForThisNickname(nicknameToUse: String) {
+        val newNavigatorIntent = Intent(this@AbsNavigationViewActivity, WebNavigatorActivity::class.java)
+        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, "http://www.jeuxvideo.com/messages-prives/boite-reception.php")
+        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(nicknameToUse))
+
+        AccountsManager.setNumberOfMp(nicknameToUse, 0)
+        AccountsManager.saveNumberOfMp()
+
+        if (AccountsManager.thereIsNoMp()) {
+            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
+            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+        }
+
+        startActivity(newNavigatorIntent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initListOfItem()
@@ -123,19 +139,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
                         updateMenuOnNextOnResume = true
                     }
                     ITEM_ID_SELECT_ACCOUNT -> {
-                        val newNavigatorIntent = Intent(this@AbsNavigationViewActivity, WebNavigatorActivity::class.java)
-                        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, "http://www.jeuxvideo.com/messages-prives/boite-reception.php")
-                        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(lastAccountNameSelected))
-
-                        AccountsManager.setNumberOfMp(lastAccountNameSelected, 0)
-                        AccountsManager.saveNumberOfMp()
-
-                        if (AccountsManager.thereIsNoMp()) {
-                            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
-                            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
-                        }
-
-                        startActivity(newNavigatorIntent)
+                        openMpPageForThisNickname(lastAccountNameSelected)
                     }
                 }
 

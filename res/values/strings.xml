@@ -26,4 +26,6 @@
     <string name="openInExternalBrowser">Ouvrir dans le navigateur externe</string>
     <string name="copyUrl">Copier l\'URL</string>
     <string name="refresh">Rafraichir</string>
+    <string name="image">image</string>
+    <string name="mpNumber">%1$s MP</string>
 </resources>
