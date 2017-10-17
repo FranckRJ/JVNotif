@@ -42,7 +42,7 @@ object NotifsManager {
             val notificationService: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             for (i: Int in 0 until listOfNotifType.size()) {
                 val newNotifType: NotifTypeInfo = listOfNotifType.valueAt(i)
-                val newChannel = NotificationChannel(newNotifType.channelID, newNotifType.channelName, newNotifType.importance)
+                val newChannel = NotificationChannel(newNotifType.channelId, newNotifType.channelName, newNotifType.importance)
 
                 newChannel.description = newNotifType.channelDesc
                 if (newNotifType.lightAndNotifColor != null) {
@@ -64,7 +64,7 @@ object NotifsManager {
     }
 
     fun makeNotif(notifType: NotifTypeInfo, contentTitle: String, contentText: String, context: Context): Notification {
-        val notificationBuilder = NotificationCompat.Builder(context, notifType.channelID)
+        val notificationBuilder = NotificationCompat.Builder(context, notifType.channelId)
 
         notificationBuilder.setSmallIcon(R.drawable.ic_notif)
         notificationBuilder.setContentTitle(contentTitle)
@@ -85,7 +85,7 @@ object NotifsManager {
 
         if (notifType.broadcastDismiss) {
             val intent = Intent(context, NotificationDismissedReceiver::class.java)
-            intent.putExtra(NotificationDismissedReceiver.EXTRA_NOTIF_ID, notifType.notifID)
+            intent.putExtra(NotificationDismissedReceiver.EXTRA_NOTIF_ID, notifType.notifId)
 
             notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, 0))
         }
@@ -102,29 +102,35 @@ object NotifsManager {
         return notificationBuilder.build()
     }
 
-    fun pushNotif(notifTypeName: NotifTypeInfo.Names, contentTitle: String, contentText: String, context: Context) {
+    fun pushNotifAndUpdateInfos(notifTypeName: NotifTypeInfo.Names, contentTitle: String, contentText: String, context: Context) {
         val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeName)
 
         if (notifType != null) {
             val notificationService = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notif: Notification = makeNotif(notifType, contentTitle, contentText, context)
 
-            notificationService.notify(notifType.notifID, notif)
+            notificationService.notify(notifType.notifId, notif)
+
+            if (notifType.notifId == MP_NOTIF_ID) {
+                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
+                PrefsManager.applyChanges()
+            }
         }
     }
 
-    fun cancelNotif(notifTypeName: NotifTypeInfo.Names, context: Context) {
+    fun cancelNotifAndClearInfos(notifTypeName: NotifTypeInfo.Names, context: Context) {
         val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeName)
 
         if (notifType != null) {
             val notificationService = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            notificationService.cancel(notifType.notifID)
+            notificationService.cancel(notifType.notifId)
+            NotificationDismissedReceiver.onNotifDismissed(notifType.notifId)
         }
     }
 
-    class NotifTypeInfo(val channelID: String = "",
-                        val notifID: Int = 0,
+    class NotifTypeInfo(val channelId: String = "",
+                        val notifId: Int = INVALID_NOTIF_ID,
                         val channelName: String = "",
                         val channelDesc: String = "",
                         @ColorInt val lightAndNotifColor: Int? = null,

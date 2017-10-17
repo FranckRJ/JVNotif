@@ -34,7 +34,7 @@ class NavigationMenuListView : ListView {
     fun setHeaderView(headerView: View) {
         /* "spacingView" représente l'espace entre le header et le premier élément de la liste, aucun
          * autre moyen plus simple n'a été trouvé. */
-        val spacingView: View = View(headerView.context)
+        val spacingView = View(headerView.context)
         spacingView.layoutParams = AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, listViewPadding)
         addHeaderView(headerView, null, false)
         addHeaderView(spacingView, null, false)

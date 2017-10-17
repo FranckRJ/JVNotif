@@ -10,8 +10,8 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
     companion object {
         val EXTRA_NOTIF_ID: String = "EXTRA_NOTIF_ID"
 
-        fun onNotifDismissed(notifID: Int) {
-            if (notifID == NotifsManager.MP_NOTIF_ID) {
+        fun onNotifDismissed(notifId: Int) {
+            if (notifId == NotifsManager.MP_NOTIF_ID) {
                 PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, false)
                 PrefsManager.applyChanges()
             }

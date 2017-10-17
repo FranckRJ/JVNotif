@@ -14,7 +14,6 @@ import android.content.Intent
 import com.franckrj.jvnotif.AddAnAccountActivity
 import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView
-import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.NotifsManager
@@ -43,11 +42,11 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     @Suppress("ObjectLiteralToLambda")
     protected val itemInNavigationClickedListener = object : AdapterView.OnItemClickListener {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            if ((adapterForNavigationMenu?.getGroupIDOfRow(id.toInt()) ?: -1) == GROUP_ID_ACCOUNT) {
+            if ((adapterForNavigationMenu?.getGroupIdOfRow(id.toInt()) ?: -1) == GROUP_ID_ACCOUNT) {
                 lastItemSelected = ITEM_ID_SELECT_ACCOUNT
                 lastAccountNameSelected = (adapterForNavigationMenu?.getTextOfRow(id.toInt()) ?: "")
             } else {
-                lastItemSelected = (adapterForNavigationMenu?.getItemIDOfRow(id.toInt()) ?: -1)
+                lastItemSelected = (adapterForNavigationMenu?.getItemIdOfRow(id.toInt()) ?: -1)
             }
 
             layoutForDrawer?.closeDrawer(GravityCompat.START)
@@ -80,7 +79,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     }
 
     private fun resetSelectRow() {
-        adapterForNavigationMenu?.rowSelected = (adapterForNavigationMenu?.getPositionDependingOfID(idOfBaseActivity, GROUP_ID_BASIC) ?: -1)
+        adapterForNavigationMenu?.rowSelected = (adapterForNavigationMenu?.getPositionDependingOfId(idOfBaseActivity, GROUP_ID_BASIC) ?: -1)
         adapterForNavigationMenu?.notifyDataSetChanged()
     }
 
@@ -88,7 +87,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         adapterForNavigationMenu?.removeAllItemsFromGroup(GROUP_ID_ACCOUNT)
 
         val listOfAccountNames: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
-        var positionOfAddAcountItem: Int = (adapterForNavigationMenu?.getPositionDependingOfID(ITEM_ID_ADD_ACCOUNT, GROUP_ID_BASIC) ?: 0)
+        var positionOfAddAcountItem: Int = (adapterForNavigationMenu?.getPositionDependingOfId(ITEM_ID_ADD_ACCOUNT, GROUP_ID_BASIC) ?: 0)
 
         for (account in listOfAccountNames) {
             listOfMenuItem.add(positionOfAddAcountItem, NavigationMenuAdapter.MenuItemInfo(account.nickname,
@@ -112,8 +111,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         AccountsManager.saveNumberOfMp()
 
         if (AccountsManager.thereIsNoMp()) {
-            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
-            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
         }
 
         startActivity(newNavigatorIntent)

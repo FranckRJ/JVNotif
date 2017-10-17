@@ -39,7 +39,6 @@ class MainActivity : AbsNavigationViewActivity() {
             val fetchNotifIntent = Intent(this@MainActivity, FetchNotifService::class.java)
             fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_SHOW_TOAST, true)
             fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, true)
-            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_LAUNCH_INTENT_WHEN_FINISHED, true)
             startService(fetchNotifIntent)
         }
     }
@@ -51,7 +50,8 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     private val numberOfMpUpdatedReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent) {
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this@MainActivity)
             updateAccountWithMpList()
         }
     }
@@ -68,7 +68,7 @@ class MainActivity : AbsNavigationViewActivity() {
 
     fun consumeIntent(intent: Intent?): Boolean {
         if (intent?.getBooleanExtra(EXTRA_MP_NOTIF_CANCELED, false) == true) {
-            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this)
             return true
         }
         return false
@@ -97,12 +97,6 @@ class MainActivity : AbsNavigationViewActivity() {
 
         if (savedInstanceState == null) {
             openedFromNotif = consumeIntent(intent)
-
-            /* On supprime la notification même si l'application n'est pas ouverte via la notification. */
-            if (!openedFromNotif) {
-                NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, this)
-                NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
-            }
         }
 
         if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif) {
@@ -112,9 +106,13 @@ class MainActivity : AbsNavigationViewActivity() {
 
     override fun onResume() {
         super.onResume()
+
         updateAccountWithMpList()
         LocalBroadcastManager.getInstance(this)
                              .registerReceiver(numberOfMpUpdatedReceiver, IntentFilter(FetchNotifTool.ACTION_MP_NUMBER_UPDATED))
+
+        /* On supprime la notification car la liste affiche déjà la même chose. */
+        NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this)
     }
 
     override fun onPause() {

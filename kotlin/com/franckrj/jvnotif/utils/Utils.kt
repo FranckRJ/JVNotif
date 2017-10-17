@@ -10,7 +10,7 @@ import android.net.Uri
 object Utils {
     fun openLinkInExternalNavigator(link: String, parentActivity: Activity) {
         try {
-            val browserIntent: Intent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
             parentActivity.startActivity(browserIntent)
         } catch (e: Exception) {
             //rien

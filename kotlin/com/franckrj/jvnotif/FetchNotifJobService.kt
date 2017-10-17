@@ -28,11 +28,11 @@ class FetchNotifJobService : JobService() {
     }
 
     companion object {
-        private val fetchNotifJobID: Int = 1456
+        private val fetchNotifJobId: Int = 1456
 
         fun initJobScheduler(context: Context) {
             val jobScheduler: JobScheduler = (context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler)
-            val jobInfoBuilder: JobInfo.Builder = JobInfo.Builder(fetchNotifJobID, ComponentName(context, FetchNotifJobService::class.java))
+            val jobInfoBuilder: JobInfo.Builder = JobInfo.Builder(fetchNotifJobId, ComponentName(context, FetchNotifJobService::class.java))
 
             jobInfoBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                           .setPeriodic(FetchNotifTool.repeatTime)

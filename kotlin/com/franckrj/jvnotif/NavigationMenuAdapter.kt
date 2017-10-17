@@ -24,16 +24,16 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
     @ColorInt var normalTextColor: Int = -1
     @ColorInt var headerTextColor: Int = -1
 
-    fun getItemIDOfRow(position: Int): Int {
+    fun getItemIdOfRow(position: Int): Int {
         if (position < listOfMenuItem.size) {
-            return listOfMenuItem[position].itemID
+            return listOfMenuItem[position].itemId
         }
         return -1
     }
 
-    fun getGroupIDOfRow(position: Int): Int {
+    fun getGroupIdOfRow(position: Int): Int {
         if (position < listOfMenuItem.size) {
-            return listOfMenuItem[position].groupID
+            return listOfMenuItem[position].groupId
         }
         return -1
     }
@@ -45,11 +45,11 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
         return ""
     }
 
-    fun getPositionDependingOfID(itemID: Int, groupID: Int): Int {
-        if (itemID != -1) {
+    fun getPositionDependingOfId(itemId: Int, groupId: Int): Int {
+        if (itemId != -1) {
             for (i: Int in listOfMenuItem.indices) {
                 val currentItemInfo: MenuItemInfo = listOfMenuItem[i]
-                if (currentItemInfo.itemID == itemID && (groupID == -1 || currentItemInfo.groupID == groupID)) {
+                if (currentItemInfo.itemId == itemId && (groupId == -1 || currentItemInfo.groupId == groupId)) {
                     return i
                 }
             }
@@ -58,21 +58,21 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
         return -1
     }
 
-    fun removeAllItemsFromGroup(groupID: Int) {
-        listOfMenuItem.filter { it.groupID == groupID }.forEach { listOfMenuItem.remove(it) }
+    fun removeAllItemsFromGroup(groupId: Int) {
+        listOfMenuItem.filter { it.groupId == groupId }.forEach { listOfMenuItem.remove(it) }
     }
 
     fun setListOfMenuItem(newList: ArrayList<MenuItemInfo>) {
         listOfMenuItem = newList
     }
 
-    fun setRowEnabled(position: Int, newVal: Boolean) {
+    /*fun setRowEnabled(position: Int, newVal: Boolean) {
         listOfMenuItem.getOrNull(position)?.isEnabled = newVal
-    }
+    }*/
 
-    fun setRowText(position: Int, newText: String) {
+    /*fun setRowText(position: Int, newText: String) {
         listOfMenuItem.getOrNull(position)?.textContent = newText
-    }
+    }*/
 
     override fun getCount(): Int = listOfMenuItem.size
 
@@ -108,8 +108,8 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
             holder.contentTextView.setTextColor(normalTextColor)
         }
 
-        if (currentMenuItemInfo.drawableResID != 0) {
-            val compoundDrawable: Drawable = Undeprecator.resourcesGetDrawable(parentActivity.resources, currentMenuItemInfo.drawableResID).mutate()
+        if (currentMenuItemInfo.drawableResId != 0) {
+            val compoundDrawable: Drawable = Undeprecator.resourcesGetDrawable(parentActivity.resources, currentMenuItemInfo.drawableResId).mutate()
 
             if (rowSelected == position && currentMenuItemInfo.isEnabled) {
                 compoundDrawable.setColorFilter(selectedItemColor, PorterDuff.Mode.SRC_ATOP)
@@ -140,9 +140,9 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
                                    val upperLineView: View)
 
     class MenuItemInfo(var textContent: String = "",
-                       @DrawableRes val drawableResID: Int = 0,
+                       @DrawableRes val drawableResId: Int = 0,
                        val isHeader: Boolean = false,
                        var isEnabled: Boolean = true,
-                       val itemID: Int = -1,
-                       val groupID: Int = -1)
+                       val itemId: Int = -1,
+                       val groupId: Int = -1)
 }

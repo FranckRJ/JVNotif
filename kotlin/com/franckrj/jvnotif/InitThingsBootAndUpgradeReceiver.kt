@@ -13,7 +13,7 @@ class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
             intent.action == "android.intent.action.QUICKBOOT_POWERON" ||
             intent.action == "com.htc.intent.action.QUICKBOOT_POWERON" ||
             intent.action == "android.intent.action.MY_PACKAGE_REPLACED") {
-            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
 
             InitShedulesManager.initSchedulers(context)
         }

@@ -7,7 +7,6 @@ import android.support.annotation.StringRes
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.util.SimpleArrayMap
 import android.widget.Toast
-import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
 
 class FetchNotifTool(val context: Context) {
@@ -16,14 +15,12 @@ class FetchNotifTool(val context: Context) {
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
     var showToasts: Boolean = false
     var onlyUpdateAndDontShowNotif: Boolean = false
-    var launchIntentWhenFinished: Boolean = false
 
     companion object {
         val wakeLockTimeout: Long = 300000
         val repeatTime: Long = 1800000
         val EXTRA_SHOW_TOAST: String = "EXTRA_SHOW_TOAST"
         val EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF: String = "EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF"
-        val EXTRA_LAUNCH_INTENT_WHEN_FINISHED: String = "EXTRA_LAUNCH_INTENT_WHEN_FINISHED"
         val ACTION_MP_NUMBER_UPDATED: String = "ACTION_MP_NUMBER_UPDATED"
     }
 
@@ -36,10 +33,7 @@ class FetchNotifTool(val context: Context) {
             if (listOfCurrentRequests.isEmpty()) {
                 updateMpNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-
-                if (launchIntentWhenFinished) {
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_MP_NUMBER_UPDATED))
-                }
+                LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_MP_NUMBER_UPDATED))
             }
         }
     }
@@ -54,8 +48,7 @@ class FetchNotifTool(val context: Context) {
 
         if (AccountsManager.thereIsNoMp()) {
             /* Aucun mp non lu. */
-            NotifsManager.cancelNotif(NotifsManager.NotifTypeInfo.Names.MP, context)
-            NotificationDismissedReceiver.onNotifDismissed(NotifsManager.MP_NOTIF_ID)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
 
             showShortToast(R.string.noNewMp)
         } else if (AccountsManager.thereIsNewMpSinceLastSavedInfos() ||
@@ -71,9 +64,7 @@ class FetchNotifTool(val context: Context) {
                 }
                 val text: String = context.getString(R.string.accountsWithNewMp, AccountsManager.getAllNicknamesThatHaveMp())
 
-                NotifsManager.pushNotif(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
-                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
-                PrefsManager.applyChanges()
+                NotifsManager.pushNotifAndUpdateInfos(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
             }
         } else {
             /* Il y a des mp non lu mais ils correspondent à la notification déjà affichée. */
@@ -83,9 +74,9 @@ class FetchNotifTool(val context: Context) {
         AccountsManager.saveNumberOfMp()
     }
 
-    private fun showShortToast(@StringRes textID: Int) {
+    private fun showShortToast(@StringRes textId: Int) {
         if (showToasts) {
-            Toast.makeText(context, textID, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, textId, Toast.LENGTH_SHORT).show()
         }
     }
 
