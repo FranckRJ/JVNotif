@@ -97,23 +97,27 @@ class MainActivity : AbsNavigationViewActivity() {
         checkNotifButton?.setOnClickListener(checkNotifClickedListener)
 
         if (savedInstanceState == null) {
-            openedFromNotif = consumeIntent(intent)
-        }
+            val fetchNotifIntent = Intent(this, FetchNotifService::class.java)
+            fetchNotifIntent.putExtra(FetchNotifTool.EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF, true)
 
-        /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si la notif
-         * était visible, pour éviter de la ré-afficher juste après qu'elle soit effacée. */
-        if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
-                !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
-            InitShedulesManager.initSchedulers(this)
+            openedFromNotif = consumeIntent(intent)
+            startService(fetchNotifIntent)
+
+            /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si la notif
+             * était visible, pour éviter de la ré-afficher juste après qu'elle soit effacée. */
+            if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
+                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                InitShedulesManager.initSchedulers(this)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
 
-        updateAccountWithMpList()
         LocalBroadcastManager.getInstance(this)
                              .registerReceiver(numberOfMpUpdatedReceiver, IntentFilter(FetchNotifTool.ACTION_MP_NUMBER_UPDATED))
+        updateAccountWithMpList()
 
         /* On supprime la notification car la liste affiche déjà la même chose. */
         NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this)
