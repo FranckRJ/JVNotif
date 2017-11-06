@@ -116,13 +116,20 @@ class FetchNotifTool(val context: Context) {
     private class GetNumberOfMpForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
         var numberOfMpListener: NewNumberOfMpReceived? = null
 
-        override fun doInBackground(vararg p0: Void?): String? {
+        override fun doInBackground(vararg param: Void?): String? {
             val currentWebInfos = WebManager.WebInfos()
-            val pageContent: String?
+            var pageContent: String?
+            var numberOfTrysRemaining: Int = 2
 
             currentWebInfos.followRedirects = false
-            /* TODO: Check pour changer le lien de la requête (si besoin). */
-            pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/sso/settings.php", "GET", "", cookie, currentWebInfos)
+            currentWebInfos.useBiggerTimeoutTime = false
+
+            do {
+                /* TODO: Check pour changer le lien de la requête (si besoin). */
+                pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/sso/settings.php", "GET", "", cookie, currentWebInfos)
+                numberOfTrysRemaining -= 1
+                currentWebInfos.useBiggerTimeoutTime = true
+            } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)
 
             @Suppress("LiftReturnOrAssignment")
             if (pageContent != null) {

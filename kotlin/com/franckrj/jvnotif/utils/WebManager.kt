@@ -103,5 +103,5 @@ object WebManager {
 
     class WebInfos (var followRedirects: Boolean = false,
                     var currentUrl: String? = "",
-                    var useBiggerTimeoutTime: Boolean = true)
+                    var useBiggerTimeoutTime: Boolean = false)
 }
