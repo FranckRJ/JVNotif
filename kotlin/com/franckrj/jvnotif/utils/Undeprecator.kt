@@ -6,20 +6,10 @@ import android.os.Build
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
-import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 
 object Undeprecator {
-    fun  viewSetBackgroundDrawable(view: View, drawable: Drawable) {
-        if (Build.VERSION.SDK_INT >= 16) {
-            view.background = drawable
-        } else {
-            @Suppress("DEPRECATION")
-            view.setBackgroundDrawable(drawable)
-        }
-    }
-
     @ColorInt
     fun  resourcesGetColor(resources: Resources, @ColorRes colorId: Int): Int {
         if (Build.VERSION.SDK_INT >= 23) {

@@ -1,7 +1,6 @@
 package com.franckrj.jvnotif.base
 
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -162,14 +161,6 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         layoutForDrawer?.addDrawerListener(newToggleForDrawer)
         layoutForDrawer?.setDrawerShadow(R.drawable.shadow_drawer, GravityCompat.START)
         updateNavigationMenu()
-
-        /* Sous Android 4.0.3-4.0.4 il est impossible de mettre un drawable en tant que background d'une view
-         * (du moins ça marche pas de la même manière), donc en solution de remplacement une couleur unie est utilisé. */
-        if (Build.VERSION.SDK_INT > 15) {
-            Undeprecator.viewSetBackgroundDrawable(navigationHeader, Undeprecator.resourcesGetDrawable(resources, R.drawable.navigation_header_background))
-        } else {
-            navigationHeader.setBackgroundColor(Undeprecator.resourcesGetColor(resources, R.color.colorPrimary))
-        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
