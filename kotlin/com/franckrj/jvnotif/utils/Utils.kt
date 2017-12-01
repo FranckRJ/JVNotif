@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.CookieManager
+import com.franckrj.jvnotif.WebNavigatorActivity
 
 object Utils {
     fun openLinkInExternalNavigator(link: String, parentActivity: Activity) {
@@ -22,6 +23,14 @@ object Utils {
         val clipboardService: ClipboardManager = fromThisActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip: ClipData = ClipData.newPlainText(textToCopy, textToCopy)
         clipboardService.primaryClip = clip
+    }
+
+    fun openPageForThisNickname(pageLink: String, nicknameToUse: String, fromThisActivity: Activity) {
+        val newNavigatorIntent = Intent(fromThisActivity, WebNavigatorActivity::class.java)
+        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, pageLink)
+        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(nicknameToUse))
+
+        fromThisActivity.startActivity(newNavigatorIntent)
     }
 
     fun suppressNotifForCookieUsageInWebview() {

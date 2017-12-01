@@ -86,11 +86,11 @@ object AccountsManager {
         }
     }
 
-    /*fun removeAccount(nicknameToSearch: String) {
+    fun removeAccount(nicknameToSearch: String) {
         accountsList
                 .filter { it.nickname.toLowerCase() == nicknameToSearch.toLowerCase() }
                 .forEach { accountsList.remove(it) }
-    }*/
+    }
 
     fun getListOfAccounts(): List<AccountInfos> {
         return accountsList

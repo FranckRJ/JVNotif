@@ -21,6 +21,7 @@ import com.franckrj.jvnotif.utils.FetchNotifTool
 import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 import com.franckrj.jvnotif.utils.PrefsManager
+import com.franckrj.jvnotif.utils.Utils
 
 class MainActivity : AbsNavigationViewActivity() {
     private var checkNotifButton: Button? = null
@@ -48,7 +49,9 @@ class MainActivity : AbsNavigationViewActivity() {
 
     private val accountClickedListener = object : AccountListAdapter.AccountViewHolder.ItemClickedListener {
         override fun onItemClickedListener(nicknameOfItem: String) {
-            openMpPageForThisNickname(nicknameOfItem)
+            Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", nicknameOfItem, this@MainActivity)
+            AccountsManager.setNumberOfMp(nicknameOfItem, 0)
+            AccountsManager.saveNumberOfMp()
         }
     }
 

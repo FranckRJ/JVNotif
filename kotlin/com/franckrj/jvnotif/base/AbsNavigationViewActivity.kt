@@ -1,5 +1,6 @@
 package com.franckrj.jvnotif.base
 
+import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.view.GravityCompat
@@ -10,25 +11,26 @@ import android.view.View
 import android.widget.AdapterView
 import com.franckrj.jvnotif.utils.Undeprecator
 import android.content.Intent
+import android.support.v7.app.AlertDialog
 import com.franckrj.jvnotif.AddAnAccountActivity
 import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView
 import com.franckrj.jvnotif.R
+import com.franckrj.jvnotif.dialogs.AccountMenuDialogFragment
 import com.franckrj.jvnotif.utils.AccountsManager
-import com.franckrj.jvnotif.utils.NotifsManager
-import com.franckrj.jvnotif.WebNavigatorActivity
 
-abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
+abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialogFragment.AskForDeleteAccount {
     protected val listOfMenuItem: ArrayList<NavigationMenuAdapter.MenuItemInfo> = ArrayList()
     protected var layoutForDrawer: DrawerLayout? = null
     protected var navigationMenuList: NavigationMenuListView? = null
     protected var adapterForNavigationMenu: NavigationMenuAdapter? = null
     protected var toggleForDrawer: ActionBarDrawerToggle? = null
     protected var lastItemSelected: Int = -1
-    protected var lastAccountNameSelected: String = ""
+    protected var lastAccountNicknameSelected: String = ""
     /* Id de l'activité de base à highlight par défaut dans le drawer. */
     protected var idOfBaseActivity: Int = -1
     protected var updateMenuOnNextOnResume: Boolean = false
+    protected var lastAccountNicknameAskedToBeDeleted: String = ""
 
     companion object {
         val GROUP_ID_BASIC: Int = 0
@@ -43,7 +45,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             if ((adapterForNavigationMenu?.getGroupIdOfRow(id.toInt()) ?: -1) == GROUP_ID_ACCOUNT) {
                 lastItemSelected = ITEM_ID_SELECT_ACCOUNT
-                lastAccountNameSelected = (adapterForNavigationMenu?.getTextOfRow(id.toInt()) ?: "")
+                lastAccountNicknameSelected = (adapterForNavigationMenu?.getTextOfRow(id.toInt()) ?: "")
             } else {
                 lastItemSelected = (adapterForNavigationMenu?.getItemIdOfRow(id.toInt()) ?: -1)
             }
@@ -51,6 +53,17 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
             layoutForDrawer?.closeDrawer(GravityCompat.START)
             adapterForNavigationMenu?.rowSelected = id.toInt()
             adapterForNavigationMenu?.notifyDataSetChanged()
+        }
+    }
+
+    @Suppress("ObjectLiteralToLambda")
+    protected val onClickInDeleteConfirmationPopupListener = object : DialogInterface.OnClickListener {
+        override fun onClick(dialog: DialogInterface?, which: Int) {
+            if (which == DialogInterface.BUTTON_POSITIVE)  {
+                AccountsManager.removeAccount(lastAccountNicknameAskedToBeDeleted)
+                AccountsManager.saveListOfAccounts()
+                updateNavigationMenu()
+            }
         }
     }
 
@@ -85,10 +98,10 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
     private fun updateNavigationMenu() {
         adapterForNavigationMenu?.removeAllItemsFromGroup(GROUP_ID_ACCOUNT)
 
-        val listOfAccountNames: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
+        val listOfAccountNickames: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
         var positionOfAddAcountItem: Int = (adapterForNavigationMenu?.getPositionDependingOfId(ITEM_ID_ADD_ACCOUNT, GROUP_ID_BASIC) ?: 0)
 
-        for (account in listOfAccountNames) {
+        for (account in listOfAccountNickames) {
             listOfMenuItem.add(positionOfAddAcountItem, NavigationMenuAdapter.MenuItemInfo(account.nickname,
                                                                                            0,
                                                                                            false,
@@ -99,21 +112,6 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         }
 
         resetSelectRow()
-    }
-
-    protected fun openMpPageForThisNickname(nicknameToUse: String) {
-        val newNavigatorIntent = Intent(this@AbsNavigationViewActivity, WebNavigatorActivity::class.java)
-        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, "http://www.jeuxvideo.com/messages-prives/boite-reception.php")
-        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(nicknameToUse))
-
-        AccountsManager.setNumberOfMp(nicknameToUse, 0)
-        AccountsManager.saveNumberOfMp()
-
-        if (AccountsManager.thereIsNoMp()) {
-            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this@AbsNavigationViewActivity)
-        }
-
-        startActivity(newNavigatorIntent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,7 +134,11 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
                         updateMenuOnNextOnResume = true
                     }
                     ITEM_ID_SELECT_ACCOUNT -> {
-                        openMpPageForThisNickname(lastAccountNameSelected)
+                        val argForFrag = Bundle()
+                        val messageMenuDialogFragment = AccountMenuDialogFragment()
+                        argForFrag.putString(AccountMenuDialogFragment.ARG_ACCOUNT_NICKNAME, lastAccountNicknameSelected)
+                        messageMenuDialogFragment.arguments = argForFrag
+                        messageMenuDialogFragment.show(supportFragmentManager, "AccountMenuDialogFragment")
                     }
                 }
 
@@ -197,6 +199,13 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity() {
         } else {
             return super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun accountThatWantToBeDeleted(accountNicknameToDelete: String) {
+        val deleteAlertBuilder = AlertDialog.Builder(this)
+        lastAccountNicknameAskedToBeDeleted = accountNicknameToDelete
+        deleteAlertBuilder.setTitle(R.string.deleteAccount).setMessage(getString(R.string.areYouSureToDeleteThisAccount, lastAccountNicknameAskedToBeDeleted))
+                .setPositiveButton(R.string.yes, onClickInDeleteConfirmationPopupListener).setNegativeButton(R.string.no, null).show()
     }
 
     protected abstract fun initializeViewAndToolbar()

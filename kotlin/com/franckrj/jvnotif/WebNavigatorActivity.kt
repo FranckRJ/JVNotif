@@ -78,8 +78,8 @@ class WebNavigatorActivity : AbsToolbarActivity() {
                 tmpWebView.loadUrl(currentUrl)
             }
 
+            Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
             if (newCookiesToUse != null && !newCookiesToUse.isNullOrEmpty()) {
-                Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
                 CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", newCookiesToUse)
             }
             Utils.suppressNotifForCookieUsageInWebview()

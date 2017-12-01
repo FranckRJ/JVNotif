@@ -28,4 +28,19 @@
     <string name="refresh">Rafraichir</string>
     <string name="image">image</string>
     <string name="mpNumber">%1$s MP</string>
+    <string name="waitingText">…</string>
+    <string name="readMp">Lire les messages privés</string>
+    <string name="readNotif">Lire les notifications</string>
+    <string name="sendMp">Envoyer un message privé</string>
+    <string name="deleteAccount">Supprimer le compte</string>
+    <string name="areYouSureToDeleteThisAccount">Êtes-vous sûr de vouloir supprimer le compte « %1$s » de la liste des comptes ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+
+    <string-array name="choicesForAccountMenu">
+        <item>@string/readMp</item>
+        <item>@string/readNotif</item>
+        <item>@string/sendMp</item>
+        <item>@string/deleteAccount</item>
+    </string-array>
 </resources>
