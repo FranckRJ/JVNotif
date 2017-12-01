@@ -83,7 +83,6 @@ object WebManager {
             } else {
                 return buffer.toString()
             }
-
         } catch (e: Exception) {
             return null
         } finally {
