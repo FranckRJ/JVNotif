@@ -25,15 +25,19 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            android:background="@color/defaultBackgroundColor"
+            android:gravity="center_vertical">
             <EditText
                 android:id="@+id/nickname_text_addanaccount"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="8dp"
                 android:inputType="text"
                 android:maxLines="1"
-                android:hint="@string/yourNickname"/>
+                android:hint="@string/yourNickname"
+                android:background="@android:color/transparent"/>
 
             <Button
                 android:id="@+id/endaction_button_addanaccount"
@@ -41,6 +45,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/endAction"/>
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/darkerBackgroundColor"/>
 
         <WebView
             android:id="@+id/webview_addanaccount"
