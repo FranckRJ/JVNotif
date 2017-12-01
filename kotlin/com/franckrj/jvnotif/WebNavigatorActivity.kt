@@ -77,10 +77,12 @@ class WebNavigatorActivity : AbsToolbarActivity() {
                 currentUrl = newUrlToLoad
                 tmpWebView.loadUrl(currentUrl)
             }
+
             if (newCookiesToUse != null && !newCookiesToUse.isNullOrEmpty()) {
                 Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
                 CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", newCookiesToUse)
             }
+            Utils.suppressNotifForCookieUsageInWebview()
         } else if (savedInstanceState != null) {
             currentTitle = savedInstanceState.getString(SAVE_TITLE_FOR_NAVIGATOR, getString(R.string.app_name))
             currentUrl = savedInstanceState.getString(SAVE_URL_FOR_NAVIGATOR, "")

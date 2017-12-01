@@ -15,6 +15,7 @@ import com.franckrj.jvnotif.base.AbsHomeIsBackActivity
 import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.Undeprecator
+import com.franckrj.jvnotif.utils.Utils
 
 class AddAnAccountActivity : AbsHomeIsBackActivity() {
     var nicknameText: EditText? = null
@@ -68,6 +69,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
         /* Suppression de tout ce qui s'apparente de près ou de loin à un cache, des cookies etc etc
          * pour que la nouvelle connexion puisse se faire sans problèmes. */
         Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
+        Utils.suppressNotifForCookieUsageInWebview()
         jvcWebView.webViewClient = WebViewClient()
         jvcWebView.webChromeClient = WebChromeClient()
 

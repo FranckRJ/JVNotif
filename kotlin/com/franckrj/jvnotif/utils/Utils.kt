@@ -6,6 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.webkit.CookieManager
 
 object Utils {
     fun openLinkInExternalNavigator(link: String, parentActivity: Activity) {
@@ -21,5 +22,9 @@ object Utils {
         val clipboardService: ClipboardManager = fromThisActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip: ClipData = ClipData.newPlainText(textToCopy, textToCopy)
         clipboardService.primaryClip = clip
+    }
+
+    fun suppressNotifForCookieUsageInWebview() {
+        CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", "wbCookieNotifier=1")
     }
 }
