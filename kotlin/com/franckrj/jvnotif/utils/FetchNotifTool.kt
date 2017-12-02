@@ -18,8 +18,7 @@ class FetchNotifTool(val context: Context) {
     var onlyUpdateAndDontShowNotif: Boolean = false
 
     companion object {
-        val wakeLockTimeout: Long = 300000
-        val repeatTime: Long = 1800000
+        val wakeLockTimeout: Long = 120_000
         val EXTRA_SHOW_TOAST: String = "EXTRA_SHOW_TOAST"
         val EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF: String = "EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF"
         val ACTION_MP_NUMBER_UPDATED: String = "ACTION_MP_NUMBER_UPDATED"

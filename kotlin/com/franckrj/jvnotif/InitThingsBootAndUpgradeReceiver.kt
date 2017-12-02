@@ -3,6 +3,7 @@ package com.franckrj.jvnotif
 import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
+import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 
@@ -15,7 +16,9 @@ class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
             intent.action == "android.intent.action.MY_PACKAGE_REPLACED") {
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
 
-            InitShedulesManager.initSchedulers(context)
+            if (AccountsManager.getListOfAccounts().isNotEmpty()) {
+                InitShedulesManager.initSchedulers(context)
+            }
         }
     }
 }

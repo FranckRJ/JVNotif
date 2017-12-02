@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import com.franckrj.jvnotif.utils.FetchNotifTool
+import com.franckrj.jvnotif.utils.PrefsManager
 
 class FetchNotifService : Service() {
     private var wakelock: PowerManager.WakeLock? = null
@@ -24,7 +25,7 @@ class FetchNotifService : Service() {
 
             alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                                          SystemClock.elapsedRealtime(),
-                                         FetchNotifTool.repeatTime,
+                                         PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME),
                                          alarmIntent)
         }
     }

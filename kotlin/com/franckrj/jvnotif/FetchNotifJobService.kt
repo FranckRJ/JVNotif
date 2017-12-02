@@ -8,6 +8,7 @@ import android.app.job.JobInfo
 import android.content.ComponentName
 import android.app.job.JobScheduler
 import com.franckrj.jvnotif.utils.FetchNotifTool
+import com.franckrj.jvnotif.utils.PrefsManager
 
 @TargetApi(21)
 class FetchNotifJobService : JobService() {
@@ -35,7 +36,7 @@ class FetchNotifJobService : JobService() {
             val jobInfoBuilder: JobInfo.Builder = JobInfo.Builder(fetchNotifJobId, ComponentName(context, FetchNotifJobService::class.java))
 
             jobInfoBuilder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                          .setPeriodic(FetchNotifTool.repeatTime)
+                          .setPeriodic(PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME))
                           .setPersisted(true)
 
             jobScheduler.schedule(jobInfoBuilder.build())

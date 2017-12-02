@@ -17,9 +17,12 @@ import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView
 import com.franckrj.jvnotif.R
 import com.franckrj.jvnotif.dialogs.AccountMenuDialogFragment
+import com.franckrj.jvnotif.dialogs.AutocheckPeriodTimePickerDialogFragment
 import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.utils.InitShedulesManager
+import com.franckrj.jvnotif.utils.PrefsManager
 
-abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialogFragment.AskForDeleteAccount {
+abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialogFragment.AskForDeleteAccount, AutocheckPeriodTimePickerDialogFragment.NewCheckPeriodTimePicked {
     protected val listOfMenuItem: ArrayList<NavigationMenuAdapter.MenuItemInfo> = ArrayList()
     protected var layoutForDrawer: DrawerLayout? = null
     protected var navigationMenuList: NavigationMenuListView? = null
@@ -36,8 +39,9 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         val GROUP_ID_BASIC: Int = 0
         val GROUP_ID_ACCOUNT: Int = 1
         val ITEM_ID_HOME: Int = 0
-        val ITEM_ID_ADD_ACCOUNT: Int = 1
-        val ITEM_ID_SELECT_ACCOUNT: Int = 2
+        val ITEM_ID_AUTOCHECK_PERIOD_TIME: Int = 1
+        val ITEM_ID_ADD_ACCOUNT: Int = 2
+        val ITEM_ID_SELECT_ACCOUNT: Int = 3
     }
 
     @Suppress("ObjectLiteralToLambda")
@@ -69,10 +73,17 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
 
     private fun initListOfItem() {
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.home),
-                                                              R.drawable.ic_action_home_dark_zoom,
+                                                              R.drawable.ic_home_dark_zoom,
                                                               false,
                                                               true,
                                                               ITEM_ID_HOME,
+                                                              GROUP_ID_BASIC))
+
+        listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.checkForNewMp),
+                                                              R.drawable.ic_timer_dark_zoom,
+                                                              false,
+                                                              true,
+                                                              ITEM_ID_AUTOCHECK_PERIOD_TIME,
                                                               GROUP_ID_BASIC))
 
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.accounts),
@@ -83,7 +94,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                               -1))
 
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.addAnAccount),
-                                                              R.drawable.ic_action_content_add_dark_zoom,
+                                                              R.drawable.ic_content_add_dark_zoom,
                                                               false,
                                                               true,
                                                               ITEM_ID_ADD_ACCOUNT,
@@ -129,16 +140,23 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                 super.onDrawerClosed(drawerView)
 
                 when (lastItemSelected) {
+                    ITEM_ID_AUTOCHECK_PERIOD_TIME -> {
+                        val argForFrag = Bundle()
+                        val periodTimePickerDialogFragment = AutocheckPeriodTimePickerDialogFragment()
+                        argForFrag.putLong(AutocheckPeriodTimePickerDialogFragment.ARG_CURRENT_REFRESH_TIME, PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME))
+                        periodTimePickerDialogFragment.arguments = argForFrag
+                        periodTimePickerDialogFragment.show(supportFragmentManager, "AutocheckPeriodTimePickerDialogFragment")
+                    }
                     ITEM_ID_ADD_ACCOUNT -> {
                         startActivity(Intent(this@AbsNavigationViewActivity, AddAnAccountActivity::class.java))
                         updateMenuOnNextOnResume = true
                     }
                     ITEM_ID_SELECT_ACCOUNT -> {
                         val argForFrag = Bundle()
-                        val messageMenuDialogFragment = AccountMenuDialogFragment()
+                        val accountMenuDialogFragment = AccountMenuDialogFragment()
                         argForFrag.putString(AccountMenuDialogFragment.ARG_ACCOUNT_NICKNAME, lastAccountNicknameSelected)
-                        messageMenuDialogFragment.arguments = argForFrag
-                        messageMenuDialogFragment.show(supportFragmentManager, "AccountMenuDialogFragment")
+                        accountMenuDialogFragment.arguments = argForFrag
+                        accountMenuDialogFragment.show(supportFragmentManager, "AccountMenuDialogFragment")
                     }
                 }
 
@@ -206,6 +224,15 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         lastAccountNicknameAskedToBeDeleted = accountNicknameToDelete
         deleteAlertBuilder.setTitle(R.string.deleteAccount).setMessage(getString(R.string.areYouSureToDeleteThisAccount, lastAccountNicknameAskedToBeDeleted))
                 .setPositiveButton(R.string.yes, onClickInDeleteConfirmationPopupListener).setNegativeButton(R.string.no, null).show()
+    }
+
+    override fun getNewCheckPeriodTime(newCheckPeriodTime: Long) {
+        PrefsManager.putLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME, newCheckPeriodTime)
+        PrefsManager.applyChanges()
+
+        if (AccountsManager.getListOfAccounts().isNotEmpty()) {
+            InitShedulesManager.initSchedulers(this)
+        }
     }
 
     protected abstract fun initializeViewAndToolbar()

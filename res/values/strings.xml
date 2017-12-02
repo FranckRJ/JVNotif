@@ -36,11 +36,25 @@
     <string name="areYouSureToDeleteThisAccount">Êtes-vous sûr de vouloir supprimer le compte « %1$s » de la liste des comptes ?</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
+    <string name="every15minutes">Toutes les 15 minutes</string>
+    <string name="every30minutes">Toutes les 30 minutes</string>
+    <string name="every60minutes">Toutes les 60 minutes</string>
+    <string name="every12hours">Toutes les 12 heures</string>
+    <string name="every24hours">Toutes les 24 heures</string>
+    <string name="checkForNewMp">Vérifier les nouveaux MP</string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>
         <item>@string/readNotif</item>
         <item>@string/sendMp</item>
         <item>@string/deleteAccount</item>
+    </string-array>
+
+    <string-array name="choicesForAutocheckPeriodTime">
+        <item>@string/every15minutes</item>
+        <item>@string/every30minutes</item>
+        <item>@string/every60minutes</item>
+        <item>@string/every12hours</item>
+        <item>@string/every24hours</item>
     </string-array>
 </resources>
