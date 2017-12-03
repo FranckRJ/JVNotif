@@ -42,6 +42,7 @@
     <string name="every12hours">Toutes les 12 heures</string>
     <string name="every24hours">Toutes les 24 heures</string>
     <string name="checkForNewMp">Vérifier les nouveaux MP</string>
+    <string name="checkForNewMpWithInfos"><![CDATA[Vérifier les nouveaux MP<br><small><font color="grey">%1$s</font></small>]]></string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>

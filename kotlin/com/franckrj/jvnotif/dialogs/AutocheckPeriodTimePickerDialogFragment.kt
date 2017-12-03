@@ -11,14 +11,14 @@ import com.franckrj.jvnotif.R
 class AutocheckPeriodTimePickerDialogFragment : DialogFragment() {
     companion object {
         val ARG_CURRENT_REFRESH_TIME: String = "com.franckrj.jvnotif.autocheckperiodtimepicker.current_refresh_time"
-
-        private val equivalentInMsForChoices: LongArray = longArrayOf(900_000,  1_800_000,  3_600_000,  43_200_000, 86_400_000)
+        val ARG_ALL_REFRESH_TIMES: String = "com.franckrj.jvnotif.autocheckperiodtimepicker.all_refresh_times"
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity!!)
 
         val currentRefreshTime: Long = (arguments?.getLong(ARG_CURRENT_REFRESH_TIME, 0) ?: 0)
+        val equivalentInMsForChoices: LongArray = (arguments?.getLongArray(ARG_ALL_REFRESH_TIMES) ?: LongArray(0))
         /* Retourne -1 si l'élément n'est pas trouvé, ce qui correspond à aucun item sélectionné dans le
          * singleChoiceItems, ce qui est le comportement attendu. */
         val currentSelectedItem: Int = equivalentInMsForChoices.indexOf(currentRefreshTime)

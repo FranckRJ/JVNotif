@@ -73,13 +73,15 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
 
     private fun initListOfItem() {
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.home),
+                                                              false,
                                                               R.drawable.ic_home_dark_zoom,
                                                               false,
                                                               true,
                                                               ITEM_ID_HOME,
                                                               GROUP_ID_BASIC))
 
-        listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.checkForNewMp),
+        listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.checkForNewMpWithInfos, getString(R.string.waitingText)),
+                                                              true,
                                                               R.drawable.ic_timer_dark_zoom,
                                                               false,
                                                               true,
@@ -87,6 +89,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                               GROUP_ID_BASIC))
 
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.accounts),
+                                                              false,
                                                               0,
                                                               true,
                                                               true,
@@ -94,6 +97,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                               -1))
 
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.addAnAccount),
+                                                              false,
                                                               R.drawable.ic_content_add_dark_zoom,
                                                               false,
                                                               true,
@@ -107,6 +111,17 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
     }
 
     private fun updateNavigationMenu() {
+        val positionOfAutocheckPeriodTime: Int = (adapterForNavigationMenu?.getPositionDependingOfId(ITEM_ID_AUTOCHECK_PERIOD_TIME, GROUP_ID_BASIC) ?: 0)
+        val indexOfAutocheckPeriodTimeInfo: Int = PrefsManager.allAutocheckPeriodTimes.indexOf(PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME))
+        val arrayOfAutocheckPeriodTimeInfo: Array<String>? = resources?.getStringArray(R.array.choicesForAutocheckPeriodTime)
+        val autocheckPeriodTimeInfo: String = if (arrayOfAutocheckPeriodTimeInfo != null && indexOfAutocheckPeriodTimeInfo >= 0 && indexOfAutocheckPeriodTimeInfo < arrayOfAutocheckPeriodTimeInfo.size) {
+                                                  arrayOfAutocheckPeriodTimeInfo[indexOfAutocheckPeriodTimeInfo]
+                                              } else {
+                                                  getString(R.string.waitingText)
+                                              }
+
+        adapterForNavigationMenu?.setRowText(positionOfAutocheckPeriodTime, getString(R.string.checkForNewMpWithInfos, autocheckPeriodTimeInfo))
+
         adapterForNavigationMenu?.removeAllItemsFromGroup(GROUP_ID_ACCOUNT)
 
         val listOfAccountNickames: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
@@ -114,6 +129,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
 
         for (account in listOfAccountNickames) {
             listOfMenuItem.add(positionOfAddAcountItem, NavigationMenuAdapter.MenuItemInfo(account.nickname,
+                                                                                           false,
                                                                                            0,
                                                                                            false,
                                                                                            true,
@@ -144,6 +160,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                         val argForFrag = Bundle()
                         val periodTimePickerDialogFragment = AutocheckPeriodTimePickerDialogFragment()
                         argForFrag.putLong(AutocheckPeriodTimePickerDialogFragment.ARG_CURRENT_REFRESH_TIME, PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME))
+                        argForFrag.putLongArray(AutocheckPeriodTimePickerDialogFragment.ARG_ALL_REFRESH_TIMES, PrefsManager.allAutocheckPeriodTimes)
                         periodTimePickerDialogFragment.arguments = argForFrag
                         periodTimePickerDialogFragment.show(supportFragmentManager, "AutocheckPeriodTimePickerDialogFragment")
                     }
@@ -233,6 +250,8 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
             InitShedulesManager.initSchedulers(this)
         }
+
+        updateNavigationMenu()
     }
 
     protected abstract fun initializeViewAndToolbar()

@@ -7,6 +7,9 @@ import android.support.v4.util.SimpleArrayMap
 import com.franckrj.jvnotif.R
 
 object PrefsManager {
+    val allAutocheckPeriodTimes: LongArray = longArrayOf(900_000,  1_800_000,  3_600_000,  43_200_000, 86_400_000)
+    val defaultAutocheckPeriodTime: Long = 1_800_000
+
     private var currentPrefs: SharedPreferences? = null
     private var currentPrefsEdit: SharedPreferences.Editor? = null
     private val listOfStringPrefs: SimpleArrayMap<StringPref.Names, StringPref> = SimpleArrayMap()
@@ -22,7 +25,7 @@ object PrefsManager {
         listOfStringPrefs.put(StringPref.Names.LIST_OF_COOKIES, StringPref("pref.listOfCookies", ""))
         listOfStringPrefs.put(StringPref.Names.LIST_OF_NUMBER_OF_MP, StringPref("pref.listOfNumberOfMp", ""))
         listOfBoolPrefs.put(BoolPref.Names.MP_NOTIF_IS_VISIBLE, BoolPref("pref.mpNotifIsVisible", false))
-        listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", 1_800_000))
+        listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", defaultAutocheckPeriodTime))
     }
 
     fun getString(prefName: StringPref.Names): String {

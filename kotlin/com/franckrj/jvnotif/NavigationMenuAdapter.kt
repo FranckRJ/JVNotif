@@ -70,9 +70,9 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
         listOfMenuItem.getOrNull(position)?.isEnabled = newVal
     }*/
 
-    /*fun setRowText(position: Int, newText: String) {
+    fun setRowText(position: Int, newText: String) {
         listOfMenuItem.getOrNull(position)?.textContent = newText
-    }*/
+    }
 
     override fun getCount(): Int = listOfMenuItem.size
 
@@ -97,7 +97,13 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
             holder = (viewToUse.tag as CustomViewHolder)
         }
 
-        holder.contentTextView.text = currentMenuItemInfo.textContent
+        if (currentMenuItemInfo.textIsHtml) {
+            holder.contentTextView.text = Undeprecator.htmlFromHtml(currentMenuItemInfo.textContent)
+            holder.contentTextView.maxLines = 2
+        } else {
+            holder.contentTextView.text = currentMenuItemInfo.textContent
+            holder.contentTextView.maxLines = 1
+        }
         holder.contentTextView.alpha = (if (currentMenuItemInfo.isEnabled) 1f else 0.33f)
 
         if (currentMenuItemInfo.isHeader) {
@@ -140,6 +146,7 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
                                    val upperLineView: View)
 
     class MenuItemInfo(var textContent: String = "",
+                       var textIsHtml: Boolean = false,
                        @DrawableRes val drawableResId: Int = 0,
                        val isHeader: Boolean = false,
                        var isEnabled: Boolean = true,

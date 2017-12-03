@@ -8,6 +8,8 @@ import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
 import android.webkit.CookieManager
 import android.webkit.WebSettings
+import android.text.Html
+import android.text.Spanned
 
 object Undeprecator {
     @ColorInt
@@ -26,6 +28,15 @@ object Undeprecator {
         } else {
             @Suppress("DEPRECATION")
             return resources.getDrawable(drawableId)
+        }
+    }
+
+    fun htmlFromHtml(source: String): Spanned {
+        if (Build.VERSION.SDK_INT >= 24) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            @Suppress("DEPRECATION")
+            return Html.fromHtml(source)
         }
     }
 
