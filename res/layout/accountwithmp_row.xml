@@ -6,9 +6,9 @@
     android:padding="8dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/image_accountwithmp_row"

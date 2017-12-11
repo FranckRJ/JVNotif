@@ -24,18 +24,15 @@
             android:layout_centerInParent="true"
             android:text="@string/checkNotif"/>
 
-        <include
-            android:id="@+id/toolbar_main"
-            layout="@layout/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"/>
-
         <View
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:background="@drawable/shadow_top"
-            android:layout_below="@+id/toolbar_main"/>
+            android:layout_below="@+id/toolbar_main"
+            android:background="@drawable/shadow_top"/>
+
+        <include
+            android:id="@+id/toolbar_main"
+            layout="@layout/toolbar"/>
 
     </RelativeLayout>
 
