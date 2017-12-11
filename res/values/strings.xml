@@ -12,7 +12,7 @@
     <string name="endAction">Terminer</string>
     <string name="errorNicknameMissingAddAnAccount">Veuillez insérer le pseudo avec lequel vous vous êtes connecté dans le champ en haut.</string>
     <string name="errorCookiesMissingAddAnAccount">Vous n\'êtes pas connecté sur JVC.</string>
-    <string name="warningNotConnected">Vous ne vous êtes pas connecté !</string>
+    <string name="warningNotConnected">ATTENTION : Vous ne vous êtes pas connecté !</string>
     <string name="connectionSuccessful">Connexion réussie.</string>
     <string name="errorActionAlreadyRunning">Erreur, action déjà en cours.</string>
     <string name="mpChannel">MP</string>
