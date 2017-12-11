@@ -175,7 +175,7 @@ class MainActivity : AbsNavigationViewActivity() {
 
             init {
                 val image: ImageView = mainView.findViewById(R.id.image_accountwithmp_row)
-                image.setColorFilter(Color.rgb(253, 83, 46))
+                image.setColorFilter(Color.rgb(255, 93, 53))
 
                 mainView.setOnClickListener({
                     onItemClickedListener?.onItemClickedListener(nicknameView.text.toString())
