@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -113,6 +114,14 @@ class MainActivity : AbsNavigationViewActivity() {
                     !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
                 InitShedulesManager.initSchedulers(this)
             }
+        }
+
+        //vidage du cache des webviews
+        if (PrefsManager.getInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED) > 15) {
+            val tmpWebView = WebView(this)
+            tmpWebView.clearCache(true)
+            PrefsManager.putInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED, 0)
+            PrefsManager.applyChanges()
         }
     }
 

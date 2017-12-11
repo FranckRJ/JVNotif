@@ -14,6 +14,7 @@ object PrefsManager {
     private var currentPrefsEdit: SharedPreferences.Editor? = null
     private val listOfStringPrefs: SimpleArrayMap<StringPref.Names, StringPref> = SimpleArrayMap()
     private val listOfBoolPrefs: SimpleArrayMap<BoolPref.Names, BoolPref> = SimpleArrayMap()
+    private val listOfIntPrefs: SimpleArrayMap<IntPref.Names, IntPref> = SimpleArrayMap()
     private val listOfLongPrefs: SimpleArrayMap<LongPref.Names, LongPref> = SimpleArrayMap()
 
     fun initializeSharedPrefs(currentContext: Context) {
@@ -25,6 +26,7 @@ object PrefsManager {
         listOfStringPrefs.put(StringPref.Names.LIST_OF_COOKIES, StringPref("pref.listOfCookies", ""))
         listOfStringPrefs.put(StringPref.Names.LIST_OF_NUMBER_OF_MP, StringPref("pref.listOfNumberOfMp", ""))
         listOfBoolPrefs.put(BoolPref.Names.MP_NOTIF_IS_VISIBLE, BoolPref("pref.mpNotifIsVisible", false))
+        listOfIntPrefs.put(IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED, IntPref("pref.numberOfWebviewOpenSinceCacheCleared", 0))
         listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", defaultAutocheckPeriodTime))
     }
 
@@ -85,6 +87,25 @@ object PrefsManager {
         }
     }
 
+    fun getInt(prefName: IntPref.Names): Int {
+        val prefInfo: IntPref? = listOfIntPrefs.get(prefName)
+
+        @Suppress("LiftReturnOrAssignment")
+        if (prefInfo != null) {
+            return currentPrefs?.getInt(prefInfo.stringName, prefInfo.defaultValue) ?: 0
+        } else {
+            return 0
+        }
+    }
+
+    fun putInt(prefName: IntPref.Names, newVal: Int) {
+        val prefInfo: IntPref? = listOfIntPrefs.get(prefName)
+
+        if (prefInfo != null) {
+            currentPrefsEdit?.putInt(prefInfo.stringName, newVal)
+        }
+    }
+
     fun applyChanges() = currentPrefsEdit?.apply()
 
     class StringPref(val stringName: String, val defaultValue: String) {
@@ -96,6 +117,12 @@ object PrefsManager {
     class BoolPref(val stringName: String, val defaultValue: Boolean) {
         enum class Names {
             MP_NOTIF_IS_VISIBLE
+        }
+    }
+
+    class IntPref(val stringName: String, val defaultValue: Int) {
+        enum class Names {
+            NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED
         }
     }
 

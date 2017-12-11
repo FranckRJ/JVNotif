@@ -12,6 +12,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import com.franckrj.jvnotif.base.AbsToolbarActivity
+import com.franckrj.jvnotif.utils.PrefsManager
 import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
 
@@ -93,6 +94,10 @@ class WebNavigatorActivity : AbsToolbarActivity() {
         }
 
         updateTitleAndSubtitle()
+
+        PrefsManager.putInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED,
+                            PrefsManager.getInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED) + 1)
+        PrefsManager.applyChanges()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
