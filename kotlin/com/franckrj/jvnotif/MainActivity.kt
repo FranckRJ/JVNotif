@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -14,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
@@ -97,6 +96,7 @@ class MainActivity : AbsNavigationViewActivity() {
 
         adapterForAccountWithMp = AccountListAdapter(this)
         adapterForAccountWithMp?.onItemClickedListener = accountClickedListener
+        accountWithMpList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         accountWithMpList.layoutManager = LinearLayoutManager(this)
         accountWithMpList.adapter = adapterForAccountWithMp
         checkNotifButton?.setOnClickListener(checkNotifClickedListener)
@@ -174,10 +174,8 @@ class MainActivity : AbsNavigationViewActivity() {
             private val notifView: TextView = mainView.findViewById(R.id.notif_accountwithmp_row)
 
             init {
-                val image: ImageView = mainView.findViewById(R.id.image_accountwithmp_row)
-                image.setColorFilter(Color.rgb(255, 93, 53))
-
-                mainView.setOnClickListener({
+                val clickableView: View = mainView.findViewById(R.id.clickable_layout_accountwithmp_row)
+                clickableView.setOnClickListener({
                     onItemClickedListener?.onItemClickedListener(nicknameView.text.toString())
                 })
             }

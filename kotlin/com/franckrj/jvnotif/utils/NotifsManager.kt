@@ -66,7 +66,7 @@ object NotifsManager {
     fun makeNotif(notifType: NotifTypeInfo, contentTitle: String, contentText: String, context: Context): Notification {
         val notificationBuilder = NotificationCompat.Builder(context, notifType.channelId)
 
-        notificationBuilder.setSmallIcon(R.drawable.ic_notif)
+        notificationBuilder.setSmallIcon(R.mipmap.ic_notif_mp)
         notificationBuilder.setContentTitle(contentTitle)
         notificationBuilder.setContentText(contentText)
 

@@ -12,8 +12,8 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/my_backup_rules"
         android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_jvnotif"
+        android:roundIcon="@mipmap/ic_jvnotif"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light.Real">
 
