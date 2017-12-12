@@ -24,10 +24,6 @@ class FetchNotifJobService : JobService() {
         }
     }
 
-    init {
-        toolForFetchNotif.showToasts = false
-    }
-
     companion object {
         private val fetchNotifJobId: Int = 1456
 

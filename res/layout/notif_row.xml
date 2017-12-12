@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@color/defaultBackgroundColor">
     <LinearLayout
-        android:id="@+id/clickable_layout_accountwithmp_row"
+        android:id="@+id/clickable_layout_notif_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
@@ -24,7 +24,7 @@
             android:contentDescription="@string/image"/>
 
         <TextView
-            android:id="@+id/nickname_accountwithmp_row"
+            android:id="@+id/nickname_notif_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
@@ -36,7 +36,7 @@
             android:layout_weight="1"/>
 
         <TextView
-            android:id="@+id/notif_accountwithmp_row"
+            android:id="@+id/notif_notif_row"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"/>

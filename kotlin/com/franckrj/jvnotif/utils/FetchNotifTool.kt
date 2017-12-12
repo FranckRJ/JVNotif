@@ -3,10 +3,8 @@ package com.franckrj.jvnotif.utils
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
-import android.support.annotation.StringRes
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.util.SimpleArrayMap
-import android.widget.Toast
 import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.R
 
@@ -14,14 +12,19 @@ class FetchNotifTool(val context: Context) {
     private val listOfCurrentRequests: ArrayList<GetNumberOfMpForAccount> = ArrayList()
     private val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, String> = SimpleArrayMap()
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
-    var showToasts: Boolean = false
-    var onlyUpdateAndDontShowNotif: Boolean = false
 
     companion object {
         val wakeLockTimeout: Long = 120_000
-        val EXTRA_SHOW_TOAST: String = "EXTRA_SHOW_TOAST"
-        val EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF: String = "EXTRA_ONLY_UPDATE_AND_DONT_SHOW_NOTIF"
-        val ACTION_MP_NUMBER_UPDATED: String = "ACTION_MP_NUMBER_UPDATED"
+        val ACTION_FETCH_NOTIF_STATE_CHANGED: String = "ACTION_FETCH_NOTIF_STATE_CHANGED"
+        val EXTRA_NEW_FETCH_NOTIF_STATE: String = "EXTRA_NEW_FETCH_NOTIF_STATE"
+        val EXTRA_FETCH_NOTIF_STATE_REASON: String = "EXTRA_FETCH_NOTIF_STATE_REASON"
+        val FETCH_NOTIF_STATE_INVALID: Int = -1
+        val FETCH_NOTIF_STATE_STARTED: Int = 0
+        val FETCH_NOTIF_STATE_FINISHED: Int = 1
+        val FETCH_NOTIF_REASON_NO_REASON: Int = -1
+        val FETCH_NOTIF_REASON_OK: Int = 0
+        val FETCH_NOTIF_REASON_NO_ACCOUNT: Int = 1
+        val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
     }
 
     private val newNumberOfMpReceivedListener = object : GetNumberOfMpForAccount.NewNumberOfMpReceived {
@@ -33,7 +36,7 @@ class FetchNotifTool(val context: Context) {
             if (listOfCurrentRequests.isEmpty()) {
                 updateMpNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-                LocalBroadcastManager.getInstance(context).sendBroadcast(Intent(ACTION_MP_NUMBER_UPDATED))
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_OK)
             }
         }
     }
@@ -49,13 +52,11 @@ class FetchNotifTool(val context: Context) {
         if (AccountsManager.thereIsNoMp()) {
             /* Aucun mp non lu. */
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
-
-            showShortToast(R.string.noNewMp)
         } else if (AccountsManager.thereIsNewMpSinceLastSavedInfos() ||
                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
              * mais comme la notif a été effacée on l'affiche de nouveau. */
-            if (!onlyUpdateAndDontShowNotif && !MainActivity.isTheActiveActivity) {
+            if (!MainActivity.isTheActiveActivity) {
                 val totalNumberOfMp: Int = AccountsManager.getNumberOfMpForAllAccounts()
                 val title: String = if (totalNumberOfMp == 1) {
                     context.getString(R.string.newNumberOfMpSingular)
@@ -66,21 +67,25 @@ class FetchNotifTool(val context: Context) {
 
                 NotifsManager.pushNotifAndUpdateInfos(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
             }
-        } else {
-            /* Il y a des mp non lu mais ils correspondent à la notification déjà affichée. */
-            showShortToast(R.string.noNewMp)
-        }
+        }/* else {
+            Il y a des mp non lu mais ils correspondent à la notification déjà affichée.
+        }*/
 
         AccountsManager.saveNumberOfMp()
     }
 
-    private fun showShortToast(@StringRes textId: Int) {
-        if (showToasts) {
-            Toast.makeText(context, textId, Toast.LENGTH_SHORT).show()
-        }
+    private fun broadcastCurrentFetchState(newFetchState: Int, reasonForState: Int = FETCH_NOTIF_REASON_NO_REASON) {
+        val fetchNotifStateChangedIntent = Intent(ACTION_FETCH_NOTIF_STATE_CHANGED)
+
+        fetchNotifStateChangedIntent.putExtra(EXTRA_NEW_FETCH_NOTIF_STATE, newFetchState)
+        fetchNotifStateChangedIntent.putExtra(EXTRA_FETCH_NOTIF_STATE_REASON, reasonForState)
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(fetchNotifStateChangedIntent)
     }
 
     fun startFetchNotif() {
+        broadcastCurrentFetchState(FETCH_NOTIF_STATE_STARTED)
+
         if (listOfCurrentRequests.isEmpty()) {
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
@@ -95,10 +100,10 @@ class FetchNotifTool(val context: Context) {
                     newRequest.execute()
                 }
             } else {
-                showShortToast(R.string.connectToZeroAccount)
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_NO_ACCOUNT)
             }
         } else {
-            showShortToast(R.string.errorActionAlreadyRunning)
+            broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_ALREADY_RUNNING)
         }
     }
 
