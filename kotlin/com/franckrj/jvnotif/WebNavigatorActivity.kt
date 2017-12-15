@@ -45,6 +45,18 @@ class WebNavigatorActivity : AbsToolbarActivity() {
         val tmpWebView: WebView = findViewById(R.id.webview_webnavigator)
         navigatorWebView = tmpWebView
 
+        /* Les cookies doivent être set avant le set web/chrome client et avant le chargement de l'url.
+         * La première contrainte est totalement arbitraire, la seconde est logique. */
+        if (intent != null && savedInstanceState == null) {
+            val newCookiesToUse: String? = intent.getStringExtra(EXTRA_COOKIE_TO_USE)
+
+            Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
+            if (newCookiesToUse != null && !newCookiesToUse.isNullOrEmpty()) {
+                CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", newCookiesToUse)
+            }
+            Utils.suppressNotifForCookieUsageInWebview()
+        }
+
         tmpWebView.webViewClient = object : WebViewClient() {
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 currentUrl = url
@@ -71,19 +83,12 @@ class WebNavigatorActivity : AbsToolbarActivity() {
 
         if (intent != null && savedInstanceState == null) {
             val newUrlToLoad: String? = intent.getStringExtra(EXTRA_URL_LOAD)
-            val newCookiesToUse: String? = intent.getStringExtra(EXTRA_COOKIE_TO_USE)
 
             /* "... != null" pour activer le smartcast. */
             if (newUrlToLoad != null && !newUrlToLoad.isNullOrEmpty()) {
                 currentUrl = newUrlToLoad
                 tmpWebView.loadUrl(currentUrl)
             }
-
-            Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
-            if (newCookiesToUse != null && !newCookiesToUse.isNullOrEmpty()) {
-                CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", newCookiesToUse)
-            }
-            Utils.suppressNotifForCookieUsageInWebview()
         } else if (savedInstanceState != null) {
             currentTitle = savedInstanceState.getString(SAVE_TITLE_FOR_NAVIGATOR, getString(R.string.app_name))
             currentUrl = savedInstanceState.getString(SAVE_URL_FOR_NAVIGATOR, "")
