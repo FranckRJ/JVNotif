@@ -14,8 +14,8 @@
     <string name="errorCookiesMissingAddAnAccount">Vous n\'êtes pas connecté sur JVC.</string>
     <string name="warningNotConnected">ATTENTION : Vous ne vous êtes pas connecté !</string>
     <string name="connectionSuccessful">Connexion réussie.</string>
-    <string name="mpChannel">MP</string>
-    <string name="mpChannelDesc">MP de JVC</string>
+    <string name="mpChannel">Messages privés</string>
+    <string name="mpChannelDesc">Messages privés sur votre compte jeuxvideo.com</string>
     <string name="accountsWithNewMp">Sur %1$s.</string>
     <string name="newNumberOfMpSingular">1 nouveau MP</string>
     <string name="newNumberOfMpPlural">%1$s nouveaux MP</string>
@@ -42,6 +42,7 @@
     <string name="every24hours">Toutes les 24 heures</string>
     <string name="checkForNewMp">Vérifier les nouveaux MP</string>
     <string name="checkForNewMpWithInfos"><![CDATA[Vérifier les nouveaux MP<br><small><font color="grey">%1$s</font></small>]]></string>
+    <string name="errorDuringFetchOfMp">Erreur durant la récupération des MP.</string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>

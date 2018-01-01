@@ -75,6 +75,9 @@ class MainActivity : AbsNavigationViewActivity() {
                             FetchNotifTool.FETCH_NOTIF_REASON_NO_ACCOUNT -> {
                                 notifInfoText?.setText(R.string.connectToZeroAccount)
                             }
+                            FetchNotifTool.FETCH_NOTIF_REASON_ERROR -> {
+                                notifInfoText?.setText(R.string.errorDuringFetchOfMp)
+                            }
                             else -> {
                                 notifInfoText?.setText(R.string.noNewMp)
                             }

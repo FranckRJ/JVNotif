@@ -25,6 +25,7 @@ class FetchNotifTool(val context: Context) {
         val FETCH_NOTIF_REASON_OK: Int = 0
         val FETCH_NOTIF_REASON_NO_ACCOUNT: Int = 1
         val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
+        val FETCH_NOTIF_REASON_ERROR: Int = 3
     }
 
     private val newNumberOfMpReceivedListener = object : GetNumberOfMpForAccount.NewNumberOfMpReceived {
@@ -34,19 +35,27 @@ class FetchNotifTool(val context: Context) {
 
             /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
             if (listOfCurrentRequests.isEmpty()) {
-                updateMpNumberOfAccountsAndShowThingsIfNeeded()
+                val someMpNumberHaveBeenFetched: Boolean = updateMpNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_OK)
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_ERROR))
             }
         }
     }
 
-    private fun updateMpNumberOfAccountsAndShowThingsIfNeeded() {
+    /* Retourne true si certains mp ont pu être récupérés, false sinon. */
+    private fun updateMpNumberOfAccountsAndShowThingsIfNeeded(): Boolean {
+        var someMpNumberHaveBeenFetched: Boolean = false
+
         AccountsManager.clearNumberOfMpForAllAccounts()
         for (i: Int in 0 until listOfNumberOfMpPerAccounts.size()) {
-            val currentNumberOfMp: Int = (listOfNumberOfMpPerAccounts.valueAt(i).toIntOrNull() ?: 0)
+            val currentNumberOfMp: Int = (listOfNumberOfMpPerAccounts.valueAt(i).toIntOrNull() ?: -1)
 
-            AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), currentNumberOfMp)
+            if (currentNumberOfMp >= 0) {
+                someMpNumberHaveBeenFetched = true
+                AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), currentNumberOfMp)
+            } else {
+                AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), 0)
+            }
         }
 
         if (AccountsManager.thereIsNoMp()) {
@@ -72,6 +81,8 @@ class FetchNotifTool(val context: Context) {
         }*/
 
         AccountsManager.saveNumberOfMp()
+
+        return someMpNumberHaveBeenFetched
     }
 
     private fun broadcastCurrentFetchState(newFetchState: Int, reasonForState: Int = FETCH_NOTIF_REASON_NO_REASON) {
