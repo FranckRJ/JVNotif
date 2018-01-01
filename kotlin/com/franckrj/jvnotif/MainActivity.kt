@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
+import android.widget.ImageView
 import android.widget.TextView
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
@@ -21,6 +22,7 @@ import com.franckrj.jvnotif.utils.FetchNotifTool
 import com.franckrj.jvnotif.utils.InitShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 import com.franckrj.jvnotif.utils.PrefsManager
+import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
 
 class MainActivity : AbsNavigationViewActivity() {
@@ -29,7 +31,8 @@ class MainActivity : AbsNavigationViewActivity() {
     private var adapterForNotifList: NotifListAdapter? = null
 
     companion object {
-        val EXTRA_MP_NOTIF_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_MP_NOTIF_CANCELED"
+        val EXTRA_NOTIF_IS_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_IS_CANCELED"
+        val EXTRA_NOTIF_CANCELED_ID: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_CANCELED_ID"
 
         private val SAVE_NOTIF_INFO_TEXT: String = "SAVE_NOTIF_INFO_TEXT"
 
@@ -47,11 +50,17 @@ class MainActivity : AbsNavigationViewActivity() {
         }
     }
 
-    private val mpNotifClickedListener = object : NotifListAdapter.NotifViewHolder.ItemClickedListener {
-        override fun onItemClickedListener(nicknameOfItem: String) {
-            Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", nicknameOfItem, this@MainActivity)
-            AccountsManager.setNumberOfMp(nicknameOfItem, 0)
-            AccountsManager.saveNumberOfMp()
+    private val notifInListClickedListener = object : NotifListAdapter.NotifViewHolder.NotifClickedListener {
+        override fun onNotifClickedListener(nicknameOfNotif: String, notifType: NotifListAdapter.NotifInfo.NotifTypeName) {
+            if (notifType == NotifListAdapter.NotifInfo.NotifTypeName.MP) {
+                Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", nicknameOfNotif, this@MainActivity)
+                AccountsManager.setNumberOfMp(nicknameOfNotif, 0)
+                AccountsManager.saveNumberOfMp()
+            } else if (notifType == NotifListAdapter.NotifInfo.NotifTypeName.STARS) {
+                Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + nicknameOfNotif.toLowerCase() + "?mode=abonnements", nicknameOfNotif, this@MainActivity)
+                AccountsManager.setNumberOfStars(nicknameOfNotif, 0)
+                AccountsManager.saveNumberOfStars()
+            }
         }
     }
 
@@ -64,7 +73,7 @@ class MainActivity : AbsNavigationViewActivity() {
                 FetchNotifTool.FETCH_NOTIF_STATE_STARTED -> {
                     swipeRefresh?.isRefreshing = true
                     notifInfoText?.visibility = View.GONE
-                    adapterForNotifList?.listOfAccounts = ArrayList()
+                    adapterForNotifList?.listOfNotifs = ArrayList()
                 }
                 FetchNotifTool.FETCH_NOTIF_STATE_FINISHED -> {
                     if (reasonForState != FetchNotifTool.FETCH_NOTIF_REASON_ALREADY_RUNNING) {
@@ -76,10 +85,10 @@ class MainActivity : AbsNavigationViewActivity() {
                                 notifInfoText?.setText(R.string.connectToZeroAccount)
                             }
                             FetchNotifTool.FETCH_NOTIF_REASON_ERROR -> {
-                                notifInfoText?.setText(R.string.errorDuringFetchOfMp)
+                                notifInfoText?.setText(R.string.errorDuringFetchOfMpAndStars)
                             }
                             else -> {
-                                notifInfoText?.setText(R.string.noNewMp)
+                                notifInfoText?.setText(R.string.noNewMpAndStars)
                             }
                         }
                     }
@@ -89,7 +98,16 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     private fun setNotifListToCurrentNotifsAndUpdateInfoVisibility() {
-        adapterForNotifList?.listOfAccounts = AccountsManager.getListOfAccounts().filter { it.numberOfMp > 0 }
+        val newListOfNotifs: ArrayList<NotifListAdapter.NotifInfo> = ArrayList()
+        AccountsManager.getListOfAccounts().forEach {
+                                                if (it.numberOfMp > 0) {
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.MP, it.numberOfMp))
+                                                }
+                                                if (it.numberOfStars > 0) {
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.STARS, it.numberOfStars))
+                                                }
+                                            }
+        adapterForNotifList?.listOfNotifs = newListOfNotifs
 
         if ((adapterForNotifList?.itemCount ?: 0) > 0) {
             notifInfoText?.visibility = View.GONE
@@ -99,8 +117,8 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     fun consumeIntent(intent: Intent?): Boolean {
-        if (intent?.getBooleanExtra(EXTRA_MP_NOTIF_CANCELED, false) == true) {
-            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this)
+        if (intent?.getBooleanExtra(EXTRA_NOTIF_IS_CANCELED, false) == true) {
+            NotifsManager.cancelNotifAndClearInfos(intent.getIntExtra(EXTRA_NOTIF_CANCELED_ID, NotifsManager.INVALID_NOTIF_ID), this)
             return true
         }
         return false
@@ -122,7 +140,7 @@ class MainActivity : AbsNavigationViewActivity() {
         swipeRefresh = findViewById(R.id.swiperefresh_main)
 
         adapterForNotifList = NotifListAdapter(this)
-        adapterForNotifList?.onItemClickedListener = mpNotifClickedListener
+        adapterForNotifList?.onNotifClickedListener = notifInListClickedListener
         notifList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         notifList.layoutManager = LinearLayoutManager(this)
         notifList.adapter = adapterForNotifList
@@ -134,10 +152,11 @@ class MainActivity : AbsNavigationViewActivity() {
 
             startService(Intent(this, FetchNotifService::class.java))
 
-            /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si la notif
+            /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si une notif
              * était visible, parce que dans ce cas ils étaient forcément déjà initialisés. */
             if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
-                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE) &&
+                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)) {
                 InitShedulesManager.initSchedulers(this)
             }
         } else {
@@ -167,13 +186,14 @@ class MainActivity : AbsNavigationViewActivity() {
         /* On màj dans le onResume parce que c'est plus simple (même si moins logique) de le faire ici qu'à chaque fois quand :
          *     - on créé l'activité
          *     - on ajoute un compte
-         *     - on lit les MP depuis accountWithMpList
-         *     - on lit les MP via le menu latéral
+         *     - on lit les MP / Stars depuis accountWithMpList
+         *     - on lit les MP / Stars via le menu latéral
          */
         setNotifListToCurrentNotifsAndUpdateInfoVisibility()
 
-        /* On supprime la notification car la liste affiche déjà la même chose. */
-        NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, this)
+        /* On supprime les notifications car la liste affiche déjà la même chose. */
+        NotifsManager.cancelNotifAndClearInfos(NotifsManager.MP_NOTIF_ID, this)
+        NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, this)
     }
 
     override fun onPause() {
@@ -194,42 +214,62 @@ class MainActivity : AbsNavigationViewActivity() {
 
     private class NotifListAdapter(val context: Context) : RecyclerView.Adapter<NotifListAdapter.NotifViewHolder>() {
         private val serviceInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        var onItemClickedListener: NotifViewHolder.ItemClickedListener? = null
-        var listOfAccounts: List<AccountsManager.AccountInfos> = ArrayList()
+        var onNotifClickedListener: NotifViewHolder.NotifClickedListener? = null
+        var listOfNotifs: List<NotifInfo> = ArrayList()
             set(newList) {
                 field = newList
                 notifyDataSetChanged()
             }
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): NotifViewHolder {
-            return NotifViewHolder(serviceInflater.inflate(R.layout.notif_row, parent, false), onItemClickedListener)
+            return NotifViewHolder(serviceInflater.inflate(R.layout.notif_row, parent, false), onNotifClickedListener)
         }
 
         override fun onBindViewHolder(holder: NotifViewHolder, position: Int) {
-            holder.setInformations(listOfAccounts[position].nickname,
-                                   context.getString(R.string.mpNumber, listOfAccounts[position].numberOfMp.toString()))
+            holder.setInformations(listOfNotifs[position], context)
         }
 
-        override fun getItemCount(): Int = listOfAccounts.size
+        override fun getItemCount(): Int = listOfNotifs.size
 
-        class NotifViewHolder(mainView: View, onItemClickedListener: ItemClickedListener?) : RecyclerView.ViewHolder(mainView) {
-            private val nicknameView: TextView = mainView.findViewById(R.id.nickname_notif_row)
-            private val notifView: TextView = mainView.findViewById(R.id.notif_notif_row)
+        class NotifViewHolder(mainView: View, onItemClickedListener: NotifClickedListener?) : RecyclerView.ViewHolder(mainView) {
+            private val notifIconView: ImageView = mainView.findViewById(R.id.icon_notif_row)
+            private val notifNicknameView: TextView = mainView.findViewById(R.id.nickname_notif_row)
+            private val notifContentView: TextView = mainView.findViewById(R.id.content_notif_row)
+            private var typeOfNotif: NotifInfo.NotifTypeName = NotifInfo.NotifTypeName.INVALID
 
             init {
                 val clickableView: View = mainView.findViewById(R.id.clickable_layout_notif_row)
                 clickableView.setOnClickListener({
-                    onItemClickedListener?.onItemClickedListener(nicknameView.text.toString())
+                    onItemClickedListener?.onNotifClickedListener(notifNicknameView.text.toString(), typeOfNotif)
                 })
             }
 
-            fun setInformations(newNickname: String, newNotif: String) {
-                nicknameView.text = newNickname
-                notifView.text = newNotif
+            fun setInformations(newNotifInfo: NotifInfo, context: Context) {
+                typeOfNotif = newNotifInfo.notifType
+                notifNicknameView.text = newNotifInfo.nickname
+
+                if (typeOfNotif == NotifInfo.NotifTypeName.MP) {
+                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_mp))
+                    notifContentView.text = context.getString(R.string.mpNumber, newNotifInfo.notifNumber.toString())
+                } else if (typeOfNotif == NotifInfo.NotifTypeName.STARS) {
+                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_stars))
+
+                    if (newNotifInfo.notifNumber > 1) {
+                        notifContentView.text = context.getString(R.string.starsPluralNumber, newNotifInfo.notifNumber.toString())
+                    } else {
+                        notifContentView.text = context.getString(R.string.starsSingularNumber, newNotifInfo.notifNumber.toString())
+                    }
+                }
             }
 
-            interface ItemClickedListener {
-                fun onItemClickedListener(nicknameOfItem: String)
+            interface NotifClickedListener {
+                fun onNotifClickedListener(nicknameOfNotif: String, notifType: NotifInfo.NotifTypeName)
+            }
+        }
+
+        class NotifInfo(val nickname: String, val notifType: NotifTypeName, val notifNumber: Int) {
+            enum class NotifTypeName {
+                INVALID, MP, STARS
             }
         }
     }

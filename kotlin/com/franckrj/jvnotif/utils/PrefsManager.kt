@@ -25,7 +25,9 @@ object PrefsManager {
         listOfStringPrefs.put(StringPref.Names.LIST_OF_NICKNAMES, StringPref("pref.listOfNicknames", ""))
         listOfStringPrefs.put(StringPref.Names.LIST_OF_COOKIES, StringPref("pref.listOfCookies", ""))
         listOfStringPrefs.put(StringPref.Names.LIST_OF_NUMBER_OF_MP, StringPref("pref.listOfNumberOfMp", ""))
+        listOfStringPrefs.put(StringPref.Names.LIST_OF_NUMBER_OF_STARS, StringPref("pref.listOfNumberOfStars", ""))
         listOfBoolPrefs.put(BoolPref.Names.MP_NOTIF_IS_VISIBLE, BoolPref("pref.mpNotifIsVisible", false))
+        listOfBoolPrefs.put(BoolPref.Names.STARS_NOTIF_IS_VISIBLE, BoolPref("pref.starsNotifIsVisible", false))
         listOfIntPrefs.put(IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED, IntPref("pref.numberOfWebviewOpenSinceCacheCleared", 0))
         listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", defaultAutocheckPeriodTime))
     }
@@ -110,13 +112,13 @@ object PrefsManager {
 
     class StringPref(val stringName: String, val defaultValue: String) {
         enum class Names {
-            LIST_OF_NICKNAMES, LIST_OF_COOKIES, LIST_OF_NUMBER_OF_MP
+            LIST_OF_NICKNAMES, LIST_OF_COOKIES, LIST_OF_NUMBER_OF_MP, LIST_OF_NUMBER_OF_STARS
         }
     }
 
     class BoolPref(val stringName: String, val defaultValue: Boolean) {
         enum class Names {
-            MP_NOTIF_IS_VISIBLE
+            MP_NOTIF_IS_VISIBLE, STARS_NOTIF_IS_VISIBLE
         }
     }
 

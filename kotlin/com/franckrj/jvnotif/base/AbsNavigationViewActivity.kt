@@ -80,7 +80,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                               ITEM_ID_HOME,
                                                               GROUP_ID_BASIC))
 
-        listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.checkForNewMpWithInfos, getString(R.string.waitingText)),
+        listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.checkForNewMpAndStarsWithInfos, getString(R.string.waitingText)),
                                                               true,
                                                               R.drawable.ic_timer_dark_zoom,
                                                               false,
@@ -120,7 +120,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                   getString(R.string.waitingText)
                                               }
 
-        adapterForNavigationMenu?.setRowText(positionOfAutocheckPeriodTime, getString(R.string.checkForNewMpWithInfos, autocheckPeriodTimeInfo))
+        adapterForNavigationMenu?.setRowText(positionOfAutocheckPeriodTime, getString(R.string.checkForNewMpAndStarsWithInfos, autocheckPeriodTimeInfo))
 
         adapterForNavigationMenu?.removeAllItemsFromGroup(GROUP_ID_ACCOUNT)
 

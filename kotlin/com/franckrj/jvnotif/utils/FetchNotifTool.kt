@@ -9,8 +9,8 @@ import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.R
 
 class FetchNotifTool(val context: Context) {
-    private val listOfCurrentRequests: ArrayList<GetNumberOfMpForAccount> = ArrayList()
-    private val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, String> = SimpleArrayMap()
+    private val listOfCurrentRequests: ArrayList<GetNumberOfMpAndStarsForAccount> = ArrayList()
+    private val listOfNumberOfMpAndStarsPerAccounts: SimpleArrayMap<String, AccountsManager.MpAndStarsNumbers> = SimpleArrayMap()
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
 
     companion object {
@@ -28,39 +28,40 @@ class FetchNotifTool(val context: Context) {
         val FETCH_NOTIF_REASON_ERROR: Int = 3
     }
 
-    private val newNumberOfMpReceivedListener = object : GetNumberOfMpForAccount.NewNumberOfMpReceived {
-        override fun onReceiveNewNumberOfMp(nicknameOfAccount: String, numberOfMp: String?, getter: GetNumberOfMpForAccount) {
+    private val newNumberOfMpAndStarsReceivedListener = object : GetNumberOfMpAndStarsForAccount.NewNumberOfMpAndStarsReceived {
+        override fun onReceiveNewNumberOfMpAndStars(nicknameOfAccount: String, infoForMpAndStars: AccountsManager.MpAndStarsNumbers, getter: GetNumberOfMpAndStarsForAccount) {
             listOfCurrentRequests.remove(getter)
-            listOfNumberOfMpPerAccounts.put(nicknameOfAccount, numberOfMp ?: "")
+            listOfNumberOfMpAndStarsPerAccounts.put(nicknameOfAccount, infoForMpAndStars)
 
             /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
             if (listOfCurrentRequests.isEmpty()) {
-                val someMpNumberHaveBeenFetched: Boolean = updateMpNumberOfAccountsAndShowThingsIfNeeded()
+                val someMpAndStarsNumberHaveBeenFetched: Boolean = updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_ERROR))
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_ERROR))
             }
         }
     }
 
-    /* Retourne true si certains mp ont pu être récupérés, false sinon. */
-    private fun updateMpNumberOfAccountsAndShowThingsIfNeeded(): Boolean {
-        var someMpNumberHaveBeenFetched: Boolean = false
+    /* Retourne true si certains mp ou stars ont pu être récupérés, false sinon. */
+    private fun updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded(): Boolean {
+        var someMpAndStarsNumberHaveBeenFetched: Boolean = false
 
-        AccountsManager.clearNumberOfMpForAllAccounts()
-        for (i: Int in 0 until listOfNumberOfMpPerAccounts.size()) {
-            val currentNumberOfMp: Int = (listOfNumberOfMpPerAccounts.valueAt(i).toIntOrNull() ?: -1)
+        AccountsManager.clearNumberOfMpAndStarsForAllAccounts()
+        for (i: Int in 0 until listOfNumberOfMpAndStarsPerAccounts.size()) {
+            val currentMpAndStarsInfos: AccountsManager.MpAndStarsNumbers = listOfNumberOfMpAndStarsPerAccounts.valueAt(i)
 
-            if (currentNumberOfMp >= 0) {
-                someMpNumberHaveBeenFetched = true
-                AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), currentNumberOfMp)
-            } else {
-                AccountsManager.setNumberOfMp(listOfNumberOfMpPerAccounts.keyAt(i), 0)
+            if (!currentMpAndStarsInfos.isTotallyInvalid()) {
+                someMpAndStarsNumberHaveBeenFetched = true
             }
+
+            AccountsManager.setNumberOfMpAndStars(listOfNumberOfMpAndStarsPerAccounts.keyAt(i), currentMpAndStarsInfos.invalidNumbersToValidNumbers())
         }
+
+        /* ------------ MP */
 
         if (AccountsManager.thereIsNoMp()) {
             /* Aucun mp non lu. */
-            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.MP_NOTIF_ID, context)
         } else if (AccountsManager.thereIsNewMpSinceLastSavedInfos() ||
                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
@@ -72,9 +73,9 @@ class FetchNotifTool(val context: Context) {
                 } else {
                     context.getString(R.string.newNumberOfMpPlural, totalNumberOfMp.toString())
                 }
-                val text: String = context.getString(R.string.accountsWithNewMp, AccountsManager.getAllNicknamesThatHaveMp())
+                val text: String = context.getString(R.string.accountsWithNewMpOrStars, AccountsManager.getAllNicknamesThatHaveMp())
 
-                NotifsManager.pushNotifAndUpdateInfos(NotifsManager.NotifTypeInfo.Names.MP, title, text, context)
+                NotifsManager.pushNotifAndUpdateInfos(NotifsManager.MP_NOTIF_ID, title, text, context)
             }
         }/* else {
             Il y a des mp non lu mais ils correspondent à la notification déjà affichée.
@@ -82,7 +83,33 @@ class FetchNotifTool(val context: Context) {
 
         AccountsManager.saveNumberOfMp()
 
-        return someMpNumberHaveBeenFetched
+        /* ------------ STARS */
+
+        if (AccountsManager.thereIsNoStars()) {
+            /* Aucune star non vue. */
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, context)
+        } else if (AccountsManager.thereIsNewStarsSinceLastSavedInfos() ||
+                   !PrefsManager.getBool(PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)) {
+            /* Nouvelles stars non vues ou même nombre qu'avant (et supérieur à 0)
+             * mais comme la notif a été effacée on l'affiche de nouveau. */
+            if (!MainActivity.isTheActiveActivity) {
+                val totalNumberOfStars: Int = AccountsManager.getNumberOfStarsForAllAccounts()
+                val title: String = if (totalNumberOfStars == 1) {
+                    context.getString(R.string.newNumberOfStarsSingular)
+                } else {
+                    context.getString(R.string.newNumberOfStarsPlural, totalNumberOfStars.toString())
+                }
+                val text: String = context.getString(R.string.accountsWithNewMpOrStars, AccountsManager.getAllNicknamesThatHaveStars())
+
+                NotifsManager.pushNotifAndUpdateInfos(NotifsManager.STARS_NOTIF_ID, title, text, context)
+            }
+        }/* else {
+            Il y a des stars non vues mais elles correspondent à la notification déjà affichée.
+        }*/
+
+        AccountsManager.saveNumberOfStars()
+
+        return someMpAndStarsNumberHaveBeenFetched
     }
 
     private fun broadcastCurrentFetchState(newFetchState: Int, reasonForState: Int = FETCH_NOTIF_REASON_NO_REASON) {
@@ -100,14 +127,14 @@ class FetchNotifTool(val context: Context) {
         if (listOfCurrentRequests.isEmpty()) {
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
-            listOfNumberOfMpPerAccounts.clear()
+            listOfNumberOfMpAndStarsPerAccounts.clear()
 
             if (listOfAccounts.isNotEmpty()) {
                 for (account in listOfAccounts) {
-                    val newRequest = GetNumberOfMpForAccount(account.nickname, account.cookie)
+                    val newRequest = GetNumberOfMpAndStarsForAccount(account.nickname, account.cookie)
 
                     listOfCurrentRequests.add(newRequest)
-                    newRequest.numberOfMpListener = newNumberOfMpReceivedListener
+                    newRequest.numberOfMpAndStarsListener = newNumberOfMpAndStarsReceivedListener
                     newRequest.execute()
                 }
             } else {
@@ -119,19 +146,19 @@ class FetchNotifTool(val context: Context) {
     }
 
     fun stopFetchNotif() {
-        val iterator: MutableListIterator<GetNumberOfMpForAccount> = listOfCurrentRequests.listIterator()
+        val iterator: MutableListIterator<GetNumberOfMpAndStarsForAccount> = listOfCurrentRequests.listIterator()
         while (iterator.hasNext()) {
-            val currentRequest: GetNumberOfMpForAccount = iterator.next()
-            currentRequest.numberOfMpListener = null
+            val currentRequest: GetNumberOfMpAndStarsForAccount = iterator.next()
+            currentRequest.numberOfMpAndStarsListener = null
             currentRequest.cancel(false)
             iterator.remove()
         }
     }
 
-    private class GetNumberOfMpForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, String?>() {
-        var numberOfMpListener: NewNumberOfMpReceived? = null
+    private class GetNumberOfMpAndStarsForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, AccountsManager.MpAndStarsNumbers>() {
+        var numberOfMpAndStarsListener: NewNumberOfMpAndStarsReceived? = null
 
-        override fun doInBackground(vararg param: Void?): String? {
+        override fun doInBackground(vararg param: Void?): AccountsManager.MpAndStarsNumbers {
             val currentWebInfos = WebManager.WebInfos()
             var pageContent: String?
             var numberOfTrysRemaining: Int = 2
@@ -148,19 +175,19 @@ class FetchNotifTool(val context: Context) {
 
             @Suppress("LiftReturnOrAssignment")
             if (pageContent != null) {
-                return JVCParser.getNumberOfMpFromPage(pageContent)
+                return AccountsManager.MpAndStarsNumbers(JVCParser.getNumberOfMpFromPage(pageContent), JVCParser.getNumberOfStarsFromPage(pageContent))
             } else {
-                return null
+                return AccountsManager.MpAndStarsNumbers(-1, -1)
             }
         }
 
-        override fun onPostExecute(result: String?) {
+        override fun onPostExecute(result: AccountsManager.MpAndStarsNumbers) {
             super.onPostExecute(result)
-            numberOfMpListener?.onReceiveNewNumberOfMp(nickname, result, this)
+            numberOfMpAndStarsListener?.onReceiveNewNumberOfMpAndStars(nickname, result, this)
         }
 
-        interface NewNumberOfMpReceived {
-            fun onReceiveNewNumberOfMp(nicknameOfAccount: String, numberOfMp: String?, getter: GetNumberOfMpForAccount)
+        interface NewNumberOfMpAndStarsReceived {
+            fun onReceiveNewNumberOfMpAndStars(nicknameOfAccount: String, infoForMpAndStars: AccountsManager.MpAndStarsNumbers, getter: GetNumberOfMpAndStarsForAccount)
         }
     }
 

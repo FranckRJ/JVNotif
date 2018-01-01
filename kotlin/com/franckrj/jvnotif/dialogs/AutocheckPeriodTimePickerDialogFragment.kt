@@ -23,7 +23,7 @@ class AutocheckPeriodTimePickerDialogFragment : DialogFragment() {
          * singleChoiceItems, ce qui est le comportement attendu. */
         val currentSelectedItem: Int = equivalentInMsForChoices.indexOf(currentRefreshTime)
 
-        builder.setTitle(R.string.checkForNewMp)
+        builder.setTitle(R.string.checkForNewMpAndStars)
 
         @Suppress("ObjectLiteralToLambda")
         builder.setSingleChoiceItems(R.array.choicesForAutocheckPeriodTime, currentSelectedItem, object : DialogInterface.OnClickListener {

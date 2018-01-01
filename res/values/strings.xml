@@ -5,7 +5,6 @@
     <string name="home">Accueil</string>
     <string name="openDrawerContentDescRes">Ouvrir</string>
     <string name="closeDrawerContentDescRes">Fermer</string>
-    <string name="checkNotif">Checker les notifications</string>
     <string name="accounts">Comptes</string>
     <string name="addAnAccount">Ajouter un compte</string>
     <string name="yourNickname">Votre pseudo</string>
@@ -16,10 +15,14 @@
     <string name="connectionSuccessful">Connexion réussie.</string>
     <string name="mpChannel">Messages privés</string>
     <string name="mpChannelDesc">Messages privés sur votre compte jeuxvideo.com</string>
-    <string name="accountsWithNewMp">Sur %1$s.</string>
+    <string name="starsChannel">Notifications</string>
+    <string name="starsChannelDesc">Notifications sur votre compte jeuxvideo.com</string>
+    <string name="accountsWithNewMpOrStars">Sur %1$s.</string>
     <string name="newNumberOfMpSingular">1 nouveau MP</string>
     <string name="newNumberOfMpPlural">%1$s nouveaux MP</string>
-    <string name="noNewMp">Pas de nouveaux MP.</string>
+    <string name="newNumberOfStarsSingular">1 nouvelle notification</string>
+    <string name="newNumberOfStarsPlural">%1$s nouvelles notifications</string>
+    <string name="noNewMpAndStars">Pas de nouvelles notifs.</string>
     <string name="connectToZeroAccount">Vous n\'êtes connecté à aucun compte.</string>
     <string name="copyDone">Copie effectuée.</string>
     <string name="openInExternalBrowser">Ouvrir dans le navigateur externe</string>
@@ -27,9 +30,11 @@
     <string name="refresh">Rafraichir</string>
     <string name="image">image</string>
     <string name="mpNumber">%1$s MP</string>
+    <string name="starsSingularNumber">%1$s Notif</string>
+    <string name="starsPluralNumber">%1$s Notifs</string>
     <string name="waitingText">…</string>
     <string name="readMp">Lire les messages privés</string>
-    <string name="readNotif">Lire les notifications</string>
+    <string name="readStars">Lire les notifications</string>
     <string name="sendMp">Envoyer un message privé</string>
     <string name="deleteAccount">Supprimer le compte</string>
     <string name="areYouSureToDeleteThisAccount">Êtes-vous sûr de vouloir supprimer le compte « %1$s » de la liste des comptes ?</string>
@@ -40,13 +45,13 @@
     <string name="every60minutes">Toutes les 60 minutes</string>
     <string name="every12hours">Toutes les 12 heures</string>
     <string name="every24hours">Toutes les 24 heures</string>
-    <string name="checkForNewMp">Vérifier les nouveaux MP</string>
-    <string name="checkForNewMpWithInfos"><![CDATA[Vérifier les nouveaux MP<br><small><font color="grey">%1$s</font></small>]]></string>
-    <string name="errorDuringFetchOfMp">Erreur durant la récupération des MP.</string>
+    <string name="checkForNewMpAndStars">Vérifier les nouvelles notifs</string>
+    <string name="checkForNewMpAndStarsWithInfos"><![CDATA[Vérifier les nouvelles notifs<br><small><font color="grey">%1$s</font></small>]]></string>
+    <string name="errorDuringFetchOfMpAndStars">Erreur durant la récupération des notifs.</string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>
-        <item>@string/readNotif</item>
+        <item>@string/readStars</item>
         <item>@string/sendMp</item>
         <item>@string/deleteAccount</item>
     </string-array>

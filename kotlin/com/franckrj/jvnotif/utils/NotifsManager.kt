@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.support.annotation.ColorInt
+import android.support.annotation.DrawableRes
 import android.support.v4.app.NotificationCompat
 import android.support.v4.util.SimpleArrayMap
 import com.franckrj.jvnotif.MainActivity
@@ -18,16 +19,19 @@ import com.franckrj.jvnotif.R
 /* TODO: Améliorer la personnalisation des notifs (genre le truc de lockscreen etc par ex). */
 /* TODO: La couleur de la notification n'est pas la bonne. */
 object NotifsManager {
-    private val listOfNotifType: SimpleArrayMap<NotifTypeInfo.Names, NotifTypeInfo> = SimpleArrayMap()
+    private val listOfNotifType: SimpleArrayMap<Int, NotifTypeInfo> = SimpleArrayMap()
 
     val INVALID_NOTIF_ID: Int = -1
+    /* C'est des nombres au pif, c'est débile mais je peux plus vraiment changer ça. */
     val MP_NOTIF_ID: Int = 4
+    val STARS_NOTIF_ID: Int = 8
 
     fun initializeNotifs(context: Context) {
         val mpNotifType = NotifTypeInfo("com.franckrj.jvnotif.NEW_MP",
                                         MP_NOTIF_ID,
                                         context.getString(R.string.mpChannel),
                                         context.getString(R.string.mpChannelDesc),
+                                        R.mipmap.ic_notif_mp,
                                         Color.rgb(255, 93, 53),
                                         1000,
                                         1000,
@@ -35,8 +39,25 @@ object NotifsManager {
                                         (if (Build.VERSION.SDK_INT >= 16) @Suppress("DEPRECATION") Notification.PRIORITY_HIGH else null),
                                         (if (Build.VERSION.SDK_INT >= 26) NotificationManager.IMPORTANCE_HIGH else 0),
                                         true,
-                                        true)
-        listOfNotifType.put(NotifTypeInfo.Names.MP, mpNotifType)
+                                        true,
+                                        PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)
+        listOfNotifType.put(mpNotifType.notifId, mpNotifType)
+
+        val starsNotifType = NotifTypeInfo("com.franckrj.jvnotif.NEW_STARS",
+                                           STARS_NOTIF_ID,
+                                           context.getString(R.string.starsChannel),
+                                           context.getString(R.string.starsChannelDesc),
+                                           R.mipmap.ic_notif_stars,
+                                           Color.rgb(13, 77, 105),
+                                           1000,
+                                           1000,
+                                           longArrayOf(0, 200, 200, 200),
+                                           (if (Build.VERSION.SDK_INT >= 16) @Suppress("DEPRECATION") Notification.PRIORITY_HIGH else null),
+                                           (if (Build.VERSION.SDK_INT >= 26) NotificationManager.IMPORTANCE_HIGH else 0),
+                                           true,
+                                           true,
+                                           PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)
+        listOfNotifType.put(starsNotifType.notifId, starsNotifType)
 
         if (Build.VERSION.SDK_INT >= 26) {
             val notificationService: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -63,10 +84,12 @@ object NotifsManager {
         }
     }
 
+    fun getBoolPrefToChangeForNotif(notifTypeId: Int): PrefsManager.BoolPref.Names? = listOfNotifType.get(notifTypeId)?.boolPrefToChange
+
     fun makeNotif(notifType: NotifTypeInfo, contentTitle: String, contentText: String, context: Context): Notification {
         val notificationBuilder = NotificationCompat.Builder(context, notifType.channelId)
 
-        notificationBuilder.setSmallIcon(R.mipmap.ic_notif_mp)
+        notificationBuilder.setSmallIcon(notifType.notifIconId)
         notificationBuilder.setContentTitle(contentTitle)
         notificationBuilder.setContentText(contentText)
 
@@ -93,7 +116,8 @@ object NotifsManager {
         if (notifType.clickToOpenHome) {
             val intent = Intent(context, MainActivity::class.java)
             intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            intent.putExtra(MainActivity.EXTRA_MP_NOTIF_CANCELED, true)
+            intent.putExtra(MainActivity.EXTRA_NOTIF_IS_CANCELED, true)
+            intent.putExtra(MainActivity.EXTRA_NOTIF_CANCELED_ID, notifType.notifId)
 
             notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
             notificationBuilder.setAutoCancel(true)
@@ -102,8 +126,8 @@ object NotifsManager {
         return notificationBuilder.build()
     }
 
-    fun pushNotifAndUpdateInfos(notifTypeName: NotifTypeInfo.Names, contentTitle: String, contentText: String, context: Context) {
-        val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeName)
+    fun pushNotifAndUpdateInfos(notifTypeId: Int, contentTitle: String, contentText: String, context: Context) {
+        val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeId)
 
         if (notifType != null) {
             val notificationService = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -111,15 +135,15 @@ object NotifsManager {
 
             notificationService.notify(notifType.notifId, notif)
 
-            if (notifType.notifId == MP_NOTIF_ID) {
-                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, true)
+            if (notifType.boolPrefToChange != null) {
+                PrefsManager.putBool(notifType.boolPrefToChange, true)
                 PrefsManager.applyChanges()
             }
         }
     }
 
-    fun cancelNotifAndClearInfos(notifTypeName: NotifTypeInfo.Names, context: Context) {
-        val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeName)
+    fun cancelNotifAndClearInfos(notifTypeId: Int, context: Context) {
+        val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeId)
 
         if (notifType != null) {
             val notificationService = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -133,6 +157,7 @@ object NotifsManager {
                         val notifId: Int = INVALID_NOTIF_ID,
                         val channelName: String = "",
                         val channelDesc: String = "",
+                        @DrawableRes val notifIconId: Int = 0,
                         @ColorInt val lightAndNotifColor: Int? = null,
                         val lightOnMS: Int = 0,
                         val lightOffMS: Int = 0,
@@ -140,10 +165,6 @@ object NotifsManager {
                         val priority: Int? = null,
                         val importance: Int = 0,
                         val broadcastDismiss: Boolean = false,
-                        val clickToOpenHome: Boolean = false) {
-
-        enum class Names {
-            MP
-        }
-    }
+                        val clickToOpenHome: Boolean = false,
+                        val boolPrefToChange: PrefsManager.BoolPref.Names?)
 }

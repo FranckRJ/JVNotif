@@ -14,7 +14,8 @@ class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
             intent.action == "android.intent.action.QUICKBOOT_POWERON" ||
             intent.action == "com.htc.intent.action.QUICKBOOT_POWERON" ||
             intent.action == "android.intent.action.MY_PACKAGE_REPLACED") {
-            NotifsManager.cancelNotifAndClearInfos(NotifsManager.NotifTypeInfo.Names.MP, context)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.MP_NOTIF_ID, context)
+            NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, context)
 
             if (AccountsManager.getListOfAccounts().isNotEmpty()) {
                 InitShedulesManager.initSchedulers(context)

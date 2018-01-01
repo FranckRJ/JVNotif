@@ -17,7 +17,7 @@ class AccountMenuDialogFragment : DialogFragment() {
         val ARG_ACCOUNT_NICKNAME: String = "com.franckrj.jvnotif.accountmenu.account_nickname"
 
         private val POS_READ_MP: Int = 0
-        private val POS_READ_NOTIF: Int = 1
+        private val POS_READ_STARS: Int = 1
         private val POS_SEND_MP: Int = 2
         private val POS_DELETE_ACCOUNT: Int = 3
     }
@@ -38,8 +38,10 @@ class AccountMenuDialogFragment : DialogFragment() {
                         AccountsManager.setNumberOfMp(accountNickname, 0)
                         AccountsManager.saveNumberOfMp()
                     }
-                    POS_READ_NOTIF -> {
+                    POS_READ_STARS -> {
                         Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + accountNickname.toLowerCase() + "?mode=abonnements", accountNickname, activity!!)
+                        AccountsManager.setNumberOfStars(accountNickname, 0)
+                        AccountsManager.saveNumberOfStars()
                     }
                     POS_SEND_MP -> {
                         Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/nouveau.php", accountNickname, activity!!)

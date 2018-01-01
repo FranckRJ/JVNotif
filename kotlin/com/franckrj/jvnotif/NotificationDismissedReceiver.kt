@@ -11,8 +11,10 @@ class NotificationDismissedReceiver : BroadcastReceiver() {
         val EXTRA_NOTIF_ID: String = "EXTRA_NOTIF_ID"
 
         fun onNotifDismissed(notifId: Int) {
-            if (notifId == NotifsManager.MP_NOTIF_ID) {
-                PrefsManager.putBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE, false)
+            val boolPrefToChange: PrefsManager.BoolPref.Names? = NotifsManager.getBoolPrefToChangeForNotif(notifId)
+
+            if (boolPrefToChange != null) {
+                PrefsManager.putBool(boolPrefToChange, false)
                 PrefsManager.applyChanges()
             }
         }

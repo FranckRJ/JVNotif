@@ -18,7 +18,7 @@
             android:layout_below="@+id/toolbar_main"
             android:gravity="center"
             android:textStyle="bold"
-            android:text="@string/noNewMp"/>
+            android:text="@string/noNewMpAndStars"/>
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swiperefresh_main"

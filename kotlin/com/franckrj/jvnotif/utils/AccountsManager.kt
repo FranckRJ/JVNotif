@@ -5,13 +5,23 @@ import android.support.v4.util.SimpleArrayMap
 object AccountsManager {
     private val accountsList: ArrayList<AccountInfos> = ArrayList()
 
-    /* PARTIE GESTION DES MP */
+    /* ------------ PARTIE GESTION DES MP / STARS */
 
-    fun clearNumberOfMpForAllAccounts() = accountsList.forEach { it.numberOfMp = 0 }
+    fun clearNumberOfMpAndStarsForAllAccounts() = accountsList.forEach { it.numberOfMp = 0; it.numberOfStars = 0 }
 
     fun getNumberOfMpForAllAccounts(): Int = accountsList.sumBy { it.numberOfMp }
 
+    fun getNumberOfStarsForAllAccounts(): Int = accountsList.sumBy { it.numberOfStars }
+
     fun getAllNicknamesThatHaveMp(): String = accountsList.filter { it.numberOfMp > 0 }.joinToString(separator = ", ", transform = { it.nickname })
+
+    fun getAllNicknamesThatHaveStars(): String = accountsList.filter { it.numberOfStars > 0 }.joinToString(separator = ", ", transform = { it.nickname })
+
+    fun setNumberOfMpAndStars(forThisNickname: String, newNumbers: MpAndStarsNumbers) {
+        accountsList
+                .firstOrNull { it.nickname.toLowerCase() == forThisNickname.toLowerCase() }
+                ?.let { it.numberOfMp = newNumbers.mpNumber; it.numberOfStars = newNumbers.starsNumber }
+    }
 
     fun setNumberOfMp(forThisNickname: String, newNumber: Int) {
         accountsList
@@ -19,13 +29,27 @@ object AccountsManager {
                 ?.let { it.numberOfMp = newNumber }
     }
 
+    fun setNumberOfStars(forThisNickname: String, newNumber: Int) {
+        accountsList
+                .firstOrNull { it.nickname.toLowerCase() == forThisNickname.toLowerCase() }
+                ?.let { it.numberOfStars = newNumber }
+    }
+
     fun thereIsNewMpSinceLastSavedInfos(): Boolean {
-        val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, Int> = getNumberOfMpInfosFromSavedInfos()
+        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_MP, { it.numberOfMp })
+    }
+
+    fun thereIsNewStarsSinceLastSavedInfos(): Boolean {
+        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_STARS, { it.numberOfStars })
+    }
+
+    private fun thereIsNewMpOrStarsSinceLastSavedInfos(prefNameOfSavedInfos: PrefsManager.StringPref.Names, getMpOrStarsFromAccount: (AccountInfos) -> Int): Boolean {
+        val listOfNumberOfMpOrStarsPerAccounts: SimpleArrayMap<String, Int> = getNumberOfMpOrStarsInfosFromSavedInfos(prefNameOfSavedInfos)
 
         for (account: AccountInfos in accountsList) {
-            val lastNumberOfMpForAccount: Int = (listOfNumberOfMpPerAccounts.get(account.nickname.toLowerCase()) ?: 0)
+            val lastNumberOfMpOrStarsForAccount: Int = (listOfNumberOfMpOrStarsPerAccounts.get(account.nickname.toLowerCase()) ?: 0)
 
-            if (account.numberOfMp > 0 && account.numberOfMp != lastNumberOfMpForAccount) {
+            if (getMpOrStarsFromAccount(account) > 0 && getMpOrStarsFromAccount(account) != lastNumberOfMpOrStarsForAccount) {
                 return true
             }
         }
@@ -35,30 +59,42 @@ object AccountsManager {
 
     fun thereIsNoMp(): Boolean = accountsList.none { it.numberOfMp > 0 }
 
-    private fun getNumberOfMpInfosFromSavedInfos(): SimpleArrayMap<String, Int> {
-        val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, Int> = SimpleArrayMap()
-        val listOfNumberOfMpInfos: List<String> = PrefsManager.getString(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_MP)
+    fun thereIsNoStars(): Boolean = accountsList.none { it.numberOfStars > 0 }
+
+    private fun getNumberOfMpOrStarsInfosFromSavedInfos(prefNameOfSavedInfos: PrefsManager.StringPref.Names): SimpleArrayMap<String, Int> {
+        val listOfNumberOfMpOrStarsPerAccounts: SimpleArrayMap<String, Int> = SimpleArrayMap()
+        val listOfNumberOfMpOrStarsInfos: List<String> = PrefsManager.getString(prefNameOfSavedInfos)
                 .split(",")
 
         @Suppress("LoopToCallChain")
-        for (numberOfMpInfos: String in listOfNumberOfMpInfos) {
-            val listOfInfos: List<String> = numberOfMpInfos.split("=")
+        for (numberOfMpOrStarsInfos: String in listOfNumberOfMpOrStarsInfos) {
+            val listOfInfos: List<String> = numberOfMpOrStarsInfos.split("=")
 
             if (listOfInfos.size == 2) {
-                listOfNumberOfMpPerAccounts.put(listOfInfos[0].toLowerCase(), (listOfInfos[1].toIntOrNull() ?: 0))
+                listOfNumberOfMpOrStarsPerAccounts.put(listOfInfos[0].toLowerCase(), (listOfInfos[1].toIntOrNull() ?: 0))
             }
         }
 
-        return listOfNumberOfMpPerAccounts
+        return listOfNumberOfMpOrStarsPerAccounts
     }
 
     private fun loadNumberOfMp() {
-        val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, Int> = getNumberOfMpInfosFromSavedInfos()
+        val listOfNumberOfMpPerAccounts: SimpleArrayMap<String, Int> = getNumberOfMpOrStarsInfosFromSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_MP)
 
         for (i: Int in 0 until listOfNumberOfMpPerAccounts.size()) {
             accountsList
                     .firstOrNull { it.nickname.toLowerCase() == listOfNumberOfMpPerAccounts.keyAt(i).toLowerCase() }
                     ?.let { it.numberOfMp = listOfNumberOfMpPerAccounts.valueAt(i) }
+        }
+    }
+
+    private fun loadNumberOfStars() {
+        val listOfNumberOfStarsPerAccounts: SimpleArrayMap<String, Int> = getNumberOfMpOrStarsInfosFromSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_STARS)
+
+        for (i: Int in 0 until listOfNumberOfStarsPerAccounts.size()) {
+            accountsList
+                    .firstOrNull { it.nickname.toLowerCase() == listOfNumberOfStarsPerAccounts.keyAt(i).toLowerCase() }
+                    ?.let { it.numberOfStars = listOfNumberOfStarsPerAccounts.valueAt(i) }
         }
     }
 
@@ -70,7 +106,15 @@ object AccountsManager {
         PrefsManager.applyChanges()
     }
 
-    /* PARTIE GESTION DES COMPTES */
+    fun saveNumberOfStars() {
+        val numberOfStarsPerAccountInString: String =
+                accountsList.joinToString(separator = ",", transform = { it.nickname.toLowerCase() + "=" + it.numberOfStars.toString() })
+
+        PrefsManager.putString(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_STARS, numberOfStarsPerAccountInString)
+        PrefsManager.applyChanges()
+    }
+
+    /* ------------ PARTIE GESTION DES COMPTES */
 
     fun getCookieForAccount(nicknameToSearch: String): String {
         accountsList
@@ -115,6 +159,7 @@ object AccountsManager {
         }
 
         loadNumberOfMp()
+        loadNumberOfStars()
     }
 
     fun saveListOfAccounts() {
@@ -126,5 +171,11 @@ object AccountsManager {
         PrefsManager.applyChanges()
     }
 
-    class AccountInfos(val nickname: String, val cookie: String, var numberOfMp: Int = 0)
+    class MpAndStarsNumbers (val mpNumber: Int, val starsNumber: Int) {
+        fun isTotallyInvalid(): Boolean = (mpNumber == -1 && starsNumber == -1)
+
+        fun invalidNumbersToValidNumbers(): MpAndStarsNumbers = MpAndStarsNumbers(if (mpNumber == -1) 0 else mpNumber, if (starsNumber == -1) 0 else starsNumber)
+    }
+
+    class AccountInfos(val nickname: String, val cookie: String, var numberOfMp: Int = 0, var numberOfStars: Int = 0)
 }
