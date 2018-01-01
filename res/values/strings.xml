@@ -14,9 +14,9 @@
     <string name="warningNotConnected">ATTENTION : Vous ne vous êtes pas connecté !</string>
     <string name="connectionSuccessful">Connexion réussie.</string>
     <string name="mpChannel">Messages privés</string>
-    <string name="mpChannelDesc">Messages privés sur votre compte jeuxvideo.com</string>
+    <string name="mpChannelDesc">Les messages privés de vos comptes jeuxvideo.com.</string>
     <string name="starsChannel">Notifications</string>
-    <string name="starsChannelDesc">Notifications sur votre compte jeuxvideo.com</string>
+    <string name="starsChannelDesc">Les notifications de vos comptes jeuxvideo.com.</string>
     <string name="accountsWithNewMpOrStars">Sur %1$s.</string>
     <string name="newNumberOfMpSingular">1 nouveau MP</string>
     <string name="newNumberOfMpPlural">%1$s nouveaux MP</string>
