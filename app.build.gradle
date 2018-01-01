@@ -9,7 +9,7 @@ android {
         applicationId "com.franckrj.jvnotif"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 8
+        versionCode 9
         versionName "1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "fr"
