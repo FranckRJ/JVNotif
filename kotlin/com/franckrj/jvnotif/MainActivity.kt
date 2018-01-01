@@ -199,6 +199,7 @@ class MainActivity : AbsNavigationViewActivity() {
     override fun onPause() {
         isTheActiveActivity = false
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fetchNotifStateChangedReceiver)
+        swipeRefresh?.isRefreshing = false
         super.onPause()
     }
 
