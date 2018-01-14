@@ -56,7 +56,13 @@ class FetchNotifService : Service() {
     override fun onDestroy() {
         toolForFetchNotif.fetchNotifIsFinishedListener = null
         toolForFetchNotif.stopFetchNotif()
-        wakelock?.release()
+        try {
+            wakelock?.release()
+        } catch (e: Exception) {
+            /* Le release peut causer une exception sous certaines conditions, comme par exemple
+             * s'il a déjà été release, mais comme ce n'est pas certain que ce soit la seule raison
+             * toutes les possibilités sont catch, histoire d'être sûr. */
+        }
         super.onDestroy()
     }
 }
