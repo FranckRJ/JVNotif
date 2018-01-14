@@ -19,6 +19,7 @@ import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
 
 class AddAnAccountActivity : AbsHomeIsBackActivity() {
+    var jvcWebView: WebView? = null
     var nicknameText: EditText? = null
 
     @Suppress("ObjectLiteralToLambda")
@@ -61,8 +62,9 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
         setContentView(R.layout.activity_addanaccount)
         initToolbar(R.id.toolbar_addanaccount)
 
-        val jvcWebView: WebView = findViewById(R.id.webview_addanaccount)
+        val tmpWebView: WebView = findViewById(R.id.webview_addanaccount)
         val endActionButton: Button = findViewById(R.id.endaction_button_addanaccount)
+        jvcWebView = tmpWebView
         nicknameText = findViewById(R.id.nickname_text_addanaccount)
 
         endActionButton.setOnClickListener(saveCookies)
@@ -71,21 +73,33 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
          * pour que la nouvelle connexion puisse se faire sans problèmes. */
         Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
         Utils.suppressNotifForCookieUsageInWebview()
-        jvcWebView.webViewClient = WebViewClient()
-        jvcWebView.webChromeClient = WebChromeClient()
+        tmpWebView.webViewClient = WebViewClient()
+        tmpWebView.webChromeClient = WebChromeClient()
 
         @SuppressLint("SetJavaScriptEnabled")
-        jvcWebView.settings.javaScriptEnabled = true
-        Undeprecator.webSettingsSetSaveFormData(jvcWebView.settings, false)
-        Undeprecator.webSettingsSetSavePassword(jvcWebView.settings, false)
-        jvcWebView.clearCache(true)
-        jvcWebView.clearHistory()
+        tmpWebView.settings.javaScriptEnabled = true
+        Undeprecator.webSettingsSetSaveFormData(tmpWebView.settings, false)
+        Undeprecator.webSettingsSetSavePassword(tmpWebView.settings, false)
+        tmpWebView.clearCache(true)
+        tmpWebView.clearHistory()
 
-        jvcWebView.loadUrl("https://www.jeuxvideo.com/login")
+        tmpWebView.loadUrl("https://www.jeuxvideo.com/login")
 
         PrefsManager.putInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED,
                             PrefsManager.getInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED) + 1)
         PrefsManager.applyChanges()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        jvcWebView?.resumeTimers()
+        jvcWebView?.onResume()
+    }
+
+    override fun onPause() {
+        jvcWebView?.onPause()
+        jvcWebView?.pauseTimers()
+        super.onPause()
     }
 
     override fun onBackPressed() {

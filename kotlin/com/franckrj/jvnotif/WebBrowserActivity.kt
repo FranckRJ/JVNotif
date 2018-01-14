@@ -16,17 +16,17 @@ import com.franckrj.jvnotif.utils.PrefsManager
 import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
 
-class WebNavigatorActivity : AbsToolbarActivity() {
-    private var navigatorWebView: WebView? = null
+class WebBrowserActivity : AbsToolbarActivity() {
+    private var browserWebView: WebView? = null
     private var currentUrl: String = ""
     private var currentTitle: String = ""
 
     companion object {
-        val EXTRA_URL_LOAD: String = "com.franckrj.jvnotif.webnavigatoractivity.EXTRA_URL_LOAD"
-        val EXTRA_COOKIE_TO_USE: String = "com.franckrj.jvnotif.webnavigatoractivity.EXTRA_COOKIE_TO_USE"
+        val EXTRA_URL_LOAD: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_URL_LOAD"
+        val EXTRA_COOKIE_TO_USE: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_COOKIE_TO_USE"
 
-        private val SAVE_TITLE_FOR_NAVIGATOR: String = "saveTitleForNavigator"
-        private val SAVE_URL_FOR_NAVIGATOR: String = "saveUrlForNavigator"
+        private val SAVE_TITLE_FOR_BROWSER: String = "saveTitleForBrowser"
+        private val SAVE_URL_FOR_BROWSER: String = "saveUrlForBrowser"
     }
 
     private fun updateTitleAndSubtitle() {
@@ -39,11 +39,11 @@ class WebNavigatorActivity : AbsToolbarActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_webnavigator)
-        initToolbar(R.id.toolbar_webnavigator)
+        setContentView(R.layout.activity_webbrowser)
+        initToolbar(R.id.toolbar_webbrowser)
 
-        val tmpWebView: WebView = findViewById(R.id.webview_webnavigator)
-        navigatorWebView = tmpWebView
+        val tmpWebView: WebView = findViewById(R.id.webview_webbrowser)
+        browserWebView = tmpWebView
 
         /* Les cookies doivent être set avant le set web/chrome client et avant le chargement de l'url.
          * La première contrainte est totalement arbitraire, la seconde est logique. */
@@ -90,8 +90,8 @@ class WebNavigatorActivity : AbsToolbarActivity() {
                 tmpWebView.loadUrl(currentUrl)
             }
         } else if (savedInstanceState != null) {
-            currentTitle = savedInstanceState.getString(SAVE_TITLE_FOR_NAVIGATOR, getString(R.string.app_name))
-            currentUrl = savedInstanceState.getString(SAVE_URL_FOR_NAVIGATOR, "")
+            currentTitle = savedInstanceState.getString(SAVE_TITLE_FOR_BROWSER, getString(R.string.app_name))
+            currentUrl = savedInstanceState.getString(SAVE_URL_FOR_BROWSER, "")
 
             if (currentUrl.isNotEmpty()) {
                 tmpWebView.loadUrl(currentUrl)
@@ -105,16 +105,28 @@ class WebNavigatorActivity : AbsToolbarActivity() {
         PrefsManager.applyChanges()
     }
 
+    override fun onResume() {
+        super.onResume()
+        browserWebView?.resumeTimers()
+        browserWebView?.onResume()
+    }
+
+    override fun onPause() {
+        browserWebView?.onPause()
+        browserWebView?.pauseTimers()
+        super.onPause()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
-        menuInflater.inflate(R.menu.menu_webnavigator, menu)
+        menuInflater.inflate(R.menu.menu_webbrowser, menu)
         return true
     }
 
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(SAVE_TITLE_FOR_NAVIGATOR, currentTitle)
-        outState.putString(SAVE_URL_FOR_NAVIGATOR, currentUrl)
+        outState.putString(SAVE_TITLE_FOR_BROWSER, currentTitle)
+        outState.putString(SAVE_URL_FOR_BROWSER, currentUrl)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -123,17 +135,17 @@ class WebNavigatorActivity : AbsToolbarActivity() {
                 finish()
                 return true
             }
-            R.id.action_open_in_external_browser_webnavigator -> {
-                Utils.openLinkInExternalNavigator(currentUrl, this)
+            R.id.action_open_in_external_browser_webbrowser -> {
+                Utils.openLinkInExternalBrowser(currentUrl, this)
                 return true
             }
-            R.id.action_copy_url_webnavigator -> {
+            R.id.action_copy_url_webbrowser -> {
                 Utils.putStringInClipboard(currentUrl, this)
                 Toast.makeText(this, R.string.copyDone, Toast.LENGTH_SHORT).show()
                 return true
             }
-            R.id.action_reload_page_webnavigator -> {
-                navigatorWebView?.reload()
+            R.id.action_reload_page_webbrowser -> {
+                browserWebView?.reload()
                 return super.onOptionsItemSelected(item)
             }
             else -> return super.onOptionsItemSelected(item)
@@ -141,8 +153,8 @@ class WebNavigatorActivity : AbsToolbarActivity() {
     }
 
     override fun onBackPressed() {
-        if (navigatorWebView?.canGoBack() == true) {
-            navigatorWebView?.goBack()
+        if (browserWebView?.canGoBack() == true) {
+            browserWebView?.goBack()
         } else {
             super.onBackPressed()
         }

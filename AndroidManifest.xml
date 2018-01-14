@@ -31,7 +31,7 @@
             android:label="@string/addAnAccount"/>
 
         <activity
-            android:name=".WebNavigatorActivity"
+            android:name=".WebBrowserActivity"
             android:label="@string/app_name"/>
 
         <receiver

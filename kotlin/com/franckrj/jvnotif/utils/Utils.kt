@@ -7,10 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.CookieManager
-import com.franckrj.jvnotif.WebNavigatorActivity
+import com.franckrj.jvnotif.WebBrowserActivity
 
 object Utils {
-    fun openLinkInExternalNavigator(link: String, parentActivity: Activity) {
+    fun openLinkInExternalBrowser(link: String, parentActivity: Activity) {
         try {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
             parentActivity.startActivity(browserIntent)
@@ -26,11 +26,11 @@ object Utils {
     }
 
     fun openPageForThisNickname(pageLink: String, nicknameToUse: String, fromThisActivity: Activity) {
-        val newNavigatorIntent = Intent(fromThisActivity, WebNavigatorActivity::class.java)
-        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_URL_LOAD, pageLink)
-        newNavigatorIntent.putExtra(WebNavigatorActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(nicknameToUse))
+        val newBrowserIntent = Intent(fromThisActivity, WebBrowserActivity::class.java)
+        newBrowserIntent.putExtra(WebBrowserActivity.EXTRA_URL_LOAD, pageLink)
+        newBrowserIntent.putExtra(WebBrowserActivity.EXTRA_COOKIE_TO_USE, AccountsManager.getCookieForAccount(nicknameToUse))
 
-        fromThisActivity.startActivity(newNavigatorIntent)
+        fromThisActivity.startActivity(newBrowserIntent)
     }
 
     fun suppressNotifForCookieUsageInWebview() {
