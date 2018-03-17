@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object WebManager {
-    private val userAgentString: String = "JVNotif"
+    private const val userAgentString: String = "JVNotif"
 
     fun sendRequest(newLinkToPage: String, requestMethod: String, requestParameters: String, cookiesInAString: String, currentInfos: WebInfos): String? {
         var linkToPage = newLinkToPage
@@ -20,6 +20,7 @@ object WebManager {
             var line: String?
 
             if (requestMethod == "GET" && requestParameters.isNotEmpty()) {
+                @Suppress("ConvertToStringTemplate")
                 linkToPage = linkToPage + "?" + requestParameters
             }
 

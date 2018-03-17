@@ -31,10 +31,10 @@ class MainActivity : AbsNavigationViewActivity() {
     private var adapterForNotifList: NotifListAdapter? = null
 
     companion object {
-        val EXTRA_NOTIF_IS_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_IS_CANCELED"
-        val EXTRA_NOTIF_CANCELED_ID: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_CANCELED_ID"
+        const val EXTRA_NOTIF_IS_CANCELED: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_IS_CANCELED"
+        const val EXTRA_NOTIF_CANCELED_ID: String = "com.franckrj.jvnotif.mainactivity.EXTRA_NOTIF_CANCELED_ID"
 
-        private val SAVE_NOTIF_INFO_TEXT: String = "SAVE_NOTIF_INFO_TEXT"
+        private const val SAVE_NOTIF_INFO_TEXT: String = "SAVE_NOTIF_INFO_TEXT"
 
         var isTheActiveActivity: Boolean = false
     }
@@ -116,7 +116,7 @@ class MainActivity : AbsNavigationViewActivity() {
         }
     }
 
-    fun consumeIntent(intent: Intent?): Boolean {
+    private fun consumeIntent(intent: Intent?): Boolean {
         if (intent?.getBooleanExtra(EXTRA_NOTIF_IS_CANCELED, false) == true) {
             NotifsManager.cancelNotifAndClearInfos(intent.getIntExtra(EXTRA_NOTIF_CANCELED_ID, NotifsManager.INVALID_NOTIF_ID), this)
             return true
@@ -222,7 +222,7 @@ class MainActivity : AbsNavigationViewActivity() {
                 notifyDataSetChanged()
             }
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): NotifViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotifViewHolder {
             return NotifViewHolder(serviceInflater.inflate(R.layout.notif_row, parent, false), onNotifClickedListener)
         }
 

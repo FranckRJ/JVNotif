@@ -36,12 +36,12 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
     protected var lastAccountNicknameAskedToBeDeleted: String = ""
 
     companion object {
-        val GROUP_ID_BASIC: Int = 0
-        val GROUP_ID_ACCOUNT: Int = 1
-        val ITEM_ID_HOME: Int = 0
-        val ITEM_ID_AUTOCHECK_PERIOD_TIME: Int = 1
-        val ITEM_ID_ADD_ACCOUNT: Int = 2
-        val ITEM_ID_SELECT_ACCOUNT: Int = 3
+        const val GROUP_ID_BASIC: Int = 0
+        const val GROUP_ID_ACCOUNT: Int = 1
+        const val ITEM_ID_HOME: Int = 0
+        const val ITEM_ID_AUTOCHECK_PERIOD_TIME: Int = 1
+        const val ITEM_ID_ADD_ACCOUNT: Int = 2
+        const val ITEM_ID_SELECT_ACCOUNT: Int = 3
     }
 
     @Suppress("ObjectLiteralToLambda")
@@ -71,7 +71,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         }
     }
 
-    private fun initListOfItem() {
+    protected fun initListOfItem() {
         listOfMenuItem.add(NavigationMenuAdapter.MenuItemInfo(getString(R.string.home),
                                                               false,
                                                               R.drawable.ic_home_dark_zoom,
@@ -105,12 +105,12 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
                                                               GROUP_ID_BASIC))
     }
 
-    private fun resetSelectRow() {
+    protected fun resetSelectRow() {
         adapterForNavigationMenu?.rowSelected = (adapterForNavigationMenu?.getPositionDependingOfId(idOfBaseActivity, GROUP_ID_BASIC) ?: -1)
         adapterForNavigationMenu?.notifyDataSetChanged()
     }
 
-    private fun updateNavigationMenu() {
+    protected fun updateNavigationMenu() {
         val positionOfAutocheckPeriodTime: Int = (adapterForNavigationMenu?.getPositionDependingOfId(ITEM_ID_AUTOCHECK_PERIOD_TIME, GROUP_ID_BASIC) ?: 0)
         val indexOfAutocheckPeriodTimeInfo: Int = PrefsManager.allAutocheckPeriodTimes.indexOf(PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME))
         val arrayOfAutocheckPeriodTimeInfo: Array<String>? = resources?.getStringArray(R.array.choicesForAutocheckPeriodTime)

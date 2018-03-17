@@ -8,7 +8,7 @@ import com.franckrj.jvnotif.utils.PrefsManager
 
 class NotificationDismissedReceiver : BroadcastReceiver() {
     companion object {
-        val EXTRA_NOTIF_ID: String = "EXTRA_NOTIF_ID"
+        const val EXTRA_NOTIF_ID: String = "EXTRA_NOTIF_ID"
 
         fun onNotifDismissed(notifId: Int) {
             val boolPrefToChange: PrefsManager.BoolPref.Names? = NotifsManager.getBoolPrefToChangeForNotif(notifId)

@@ -19,8 +19,8 @@ import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
 
 class AddAnAccountActivity : AbsHomeIsBackActivity() {
-    var jvcWebView: WebView? = null
-    var nicknameText: EditText? = null
+    private var jvcWebView: WebView? = null
+    private var nicknameText: EditText? = null
 
     @Suppress("ObjectLiteralToLambda")
     private val saveCookies: View.OnClickListener = object : View.OnClickListener {

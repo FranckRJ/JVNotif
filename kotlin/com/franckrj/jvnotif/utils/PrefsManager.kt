@@ -8,7 +8,8 @@ import com.franckrj.jvnotif.R
 
 object PrefsManager {
     val allAutocheckPeriodTimes: LongArray = longArrayOf(900_000,  1_800_000,  3_600_000,  43_200_000, 86_400_000)
-    val defaultAutocheckPeriodTime: Long = 1_800_000
+
+    private const val defaultAutocheckPeriodTime: Long = 1_800_000
 
     private var currentPrefs: SharedPreferences? = null
     private var currentPrefsEdit: SharedPreferences.Editor? = null

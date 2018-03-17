@@ -25,7 +25,7 @@ class FetchNotifJobService : JobService() {
     }
 
     companion object {
-        private val fetchNotifJobId: Int = 1456
+        private const val fetchNotifJobId: Int = 1456
 
         fun initJobScheduler(context: Context) {
             val jobScheduler: JobScheduler = (context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler)

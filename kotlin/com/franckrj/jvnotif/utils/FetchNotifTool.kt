@@ -14,18 +14,18 @@ class FetchNotifTool(val context: Context) {
     var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
 
     companion object {
-        val wakeLockTimeout: Long = 120_000
-        val ACTION_FETCH_NOTIF_STATE_CHANGED: String = "ACTION_FETCH_NOTIF_STATE_CHANGED"
-        val EXTRA_NEW_FETCH_NOTIF_STATE: String = "EXTRA_NEW_FETCH_NOTIF_STATE"
-        val EXTRA_FETCH_NOTIF_STATE_REASON: String = "EXTRA_FETCH_NOTIF_STATE_REASON"
-        val FETCH_NOTIF_STATE_INVALID: Int = -1
-        val FETCH_NOTIF_STATE_STARTED: Int = 0
-        val FETCH_NOTIF_STATE_FINISHED: Int = 1
-        val FETCH_NOTIF_REASON_NO_REASON: Int = -1
-        val FETCH_NOTIF_REASON_OK: Int = 0
-        val FETCH_NOTIF_REASON_NO_ACCOUNT: Int = 1
-        val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
-        val FETCH_NOTIF_REASON_ERROR: Int = 3
+        const val wakeLockTimeout: Long = 120_000
+        const val ACTION_FETCH_NOTIF_STATE_CHANGED: String = "ACTION_FETCH_NOTIF_STATE_CHANGED"
+        const val EXTRA_NEW_FETCH_NOTIF_STATE: String = "EXTRA_NEW_FETCH_NOTIF_STATE"
+        const val EXTRA_FETCH_NOTIF_STATE_REASON: String = "EXTRA_FETCH_NOTIF_STATE_REASON"
+        const val FETCH_NOTIF_STATE_INVALID: Int = -1
+        const val FETCH_NOTIF_STATE_STARTED: Int = 0
+        const val FETCH_NOTIF_STATE_FINISHED: Int = 1
+        const val FETCH_NOTIF_REASON_NO_REASON: Int = -1
+        const val FETCH_NOTIF_REASON_OK: Int = 0
+        const val FETCH_NOTIF_REASON_NO_ACCOUNT: Int = 1
+        const val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
+        const val FETCH_NOTIF_REASON_ERROR: Int = 3
     }
 
     private val newNumberOfMpAndStarsReceivedListener = object : GetNumberOfMpAndStarsForAccount.NewNumberOfMpAndStarsReceived {

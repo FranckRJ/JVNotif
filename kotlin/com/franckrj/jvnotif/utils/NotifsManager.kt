@@ -19,12 +19,52 @@ import com.franckrj.jvnotif.R
 /* TODO: Améliorer la personnalisation des notifs (genre le truc de lockscreen etc par ex). */
 /* TODO: La couleur de la notification n'est pas la bonne. */
 object NotifsManager {
+    const val INVALID_NOTIF_ID: Int = -1
+    /* C'est des nombres au pif, c'est débile mais je peux plus vraiment changer ça. */
+    const val MP_NOTIF_ID: Int = 4
+    const val STARS_NOTIF_ID: Int = 8
+
     private val listOfNotifType: SimpleArrayMap<Int, NotifTypeInfo> = SimpleArrayMap()
 
-    val INVALID_NOTIF_ID: Int = -1
-    /* C'est des nombres au pif, c'est débile mais je peux plus vraiment changer ça. */
-    val MP_NOTIF_ID: Int = 4
-    val STARS_NOTIF_ID: Int = 8
+    private fun makeNotif(notifType: NotifTypeInfo, contentTitle: String, contentText: String, context: Context): Notification {
+        val notificationBuilder = NotificationCompat.Builder(context, notifType.channelId)
+
+        notificationBuilder.setSmallIcon(notifType.notifIconId)
+        notificationBuilder.setContentTitle(contentTitle)
+        notificationBuilder.setContentText(contentText)
+
+        if (notifType.lightAndNotifColor != null) {
+            notificationBuilder.color = notifType.lightAndNotifColor
+            notificationBuilder.setLights(notifType.lightAndNotifColor, notifType.lightOnMS, notifType.lightOffMS)
+        }
+
+        if (notifType.vibratePattern.isNotEmpty()) {
+            notificationBuilder.setVibrate(notifType.vibratePattern)
+        }
+
+        if (notifType.priority != null) {
+            notificationBuilder.priority = notifType.priority
+        }
+
+        if (notifType.broadcastDismiss) {
+            val intent = Intent(context, NotificationDismissedReceiver::class.java)
+            intent.putExtra(NotificationDismissedReceiver.EXTRA_NOTIF_ID, notifType.notifId)
+
+            notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, 0))
+        }
+
+        if (notifType.clickToOpenHome) {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            intent.putExtra(MainActivity.EXTRA_NOTIF_IS_CANCELED, true)
+            intent.putExtra(MainActivity.EXTRA_NOTIF_CANCELED_ID, notifType.notifId)
+
+            notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
+            notificationBuilder.setAutoCancel(true)
+        }
+
+        return notificationBuilder.build()
+    }
 
     fun initializeNotifs(context: Context) {
         val mpNotifType = NotifTypeInfo("com.franckrj.jvnotif.NEW_MP",
@@ -85,46 +125,6 @@ object NotifsManager {
     }
 
     fun getBoolPrefToChangeForNotif(notifTypeId: Int): PrefsManager.BoolPref.Names? = listOfNotifType.get(notifTypeId)?.boolPrefToChange
-
-    fun makeNotif(notifType: NotifTypeInfo, contentTitle: String, contentText: String, context: Context): Notification {
-        val notificationBuilder = NotificationCompat.Builder(context, notifType.channelId)
-
-        notificationBuilder.setSmallIcon(notifType.notifIconId)
-        notificationBuilder.setContentTitle(contentTitle)
-        notificationBuilder.setContentText(contentText)
-
-        if (notifType.lightAndNotifColor != null) {
-            notificationBuilder.color = notifType.lightAndNotifColor
-            notificationBuilder.setLights(notifType.lightAndNotifColor, notifType.lightOnMS, notifType.lightOffMS)
-        }
-
-        if (notifType.vibratePattern.isNotEmpty()) {
-            notificationBuilder.setVibrate(notifType.vibratePattern)
-        }
-
-        if (notifType.priority != null) {
-            notificationBuilder.priority = notifType.priority
-        }
-
-        if (notifType.broadcastDismiss) {
-            val intent = Intent(context, NotificationDismissedReceiver::class.java)
-            intent.putExtra(NotificationDismissedReceiver.EXTRA_NOTIF_ID, notifType.notifId)
-
-            notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, 0))
-        }
-
-        if (notifType.clickToOpenHome) {
-            val intent = Intent(context, MainActivity::class.java)
-            intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            intent.putExtra(MainActivity.EXTRA_NOTIF_IS_CANCELED, true)
-            intent.putExtra(MainActivity.EXTRA_NOTIF_CANCELED_ID, notifType.notifId)
-
-            notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
-            notificationBuilder.setAutoCancel(true)
-        }
-
-        return notificationBuilder.build()
-    }
 
     fun pushNotifAndUpdateInfos(notifTypeId: Int, contentTitle: String, contentText: String, context: Context) {
         val notifType: NotifTypeInfo? = listOfNotifType.get(notifTypeId)

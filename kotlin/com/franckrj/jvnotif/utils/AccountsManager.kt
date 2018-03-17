@@ -126,6 +126,7 @@ object AccountsManager {
 
     fun addAccount(nickname: String, cookieValue: String) {
         if (accountsList.firstOrNull { it.nickname.toLowerCase() == nickname.toLowerCase() } == null) {
+            @Suppress("ConvertToStringTemplate")
             accountsList.add(AccountInfos(nickname, "coniunctio=" + cookieValue))
         }
     }

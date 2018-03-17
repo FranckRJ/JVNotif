@@ -22,11 +22,11 @@ class WebBrowserActivity : AbsToolbarActivity() {
     private var currentTitle: String = ""
 
     companion object {
-        val EXTRA_URL_LOAD: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_URL_LOAD"
-        val EXTRA_COOKIE_TO_USE: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_COOKIE_TO_USE"
+        const val EXTRA_URL_LOAD: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_URL_LOAD"
+        const val EXTRA_COOKIE_TO_USE: String = "com.franckrj.jvnotif.webbrowseractivity.EXTRA_COOKIE_TO_USE"
 
-        private val SAVE_TITLE_FOR_BROWSER: String = "saveTitleForBrowser"
-        private val SAVE_URL_FOR_BROWSER: String = "saveUrlForBrowser"
+        private const val SAVE_TITLE_FOR_BROWSER: String = "saveTitleForBrowser"
+        private const val SAVE_URL_FOR_BROWSER: String = "saveUrlForBrowser"
     }
 
     private fun updateTitleAndSubtitle() {

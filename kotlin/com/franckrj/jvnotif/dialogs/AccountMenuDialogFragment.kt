@@ -14,16 +14,16 @@ class AccountMenuDialogFragment : DialogFragment() {
     var accountNickname: String = ""
 
     companion object {
-        val ARG_ACCOUNT_NICKNAME: String = "com.franckrj.jvnotif.accountmenu.account_nickname"
+        const val ARG_ACCOUNT_NICKNAME: String = "com.franckrj.jvnotif.accountmenu.account_nickname"
 
-        private val POS_READ_MP: Int = 0
-        private val POS_READ_STARS: Int = 1
-        private val POS_SEND_MP: Int = 2
-        private val POS_DELETE_ACCOUNT: Int = 3
+        private const val POS_READ_MP: Int = 0
+        private const val POS_READ_STARS: Int = 1
+        private const val POS_SEND_MP: Int = 2
+        private const val POS_DELETE_ACCOUNT: Int = 3
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(activity!!)
+        val builder = AlertDialog.Builder(requireActivity())
 
         accountNickname = (arguments?.getString(ARG_ACCOUNT_NICKNAME, null) ?: getString(R.string.waitingText))
 
@@ -34,17 +34,17 @@ class AccountMenuDialogFragment : DialogFragment() {
             override fun onClick(dialog: DialogInterface?, which: Int) {
                 when (which) {
                     POS_READ_MP -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", accountNickname, activity!!)
+                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", accountNickname, requireActivity())
                         AccountsManager.setNumberOfMp(accountNickname, 0)
                         AccountsManager.saveNumberOfMp()
                     }
                     POS_READ_STARS -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + accountNickname.toLowerCase() + "?mode=abonnements", accountNickname, activity!!)
+                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + accountNickname.toLowerCase() + "?mode=abonnements", accountNickname, requireActivity())
                         AccountsManager.setNumberOfStars(accountNickname, 0)
                         AccountsManager.saveNumberOfStars()
                     }
                     POS_SEND_MP -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/nouveau.php", accountNickname, activity!!)
+                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/nouveau.php", accountNickname, requireActivity())
                     }
                     POS_DELETE_ACCOUNT -> {
                         val parentActivity: Activity? = activity

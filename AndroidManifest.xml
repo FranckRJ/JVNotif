@@ -1,5 +1,6 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.franckrj.jvnotif">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -15,7 +16,8 @@
         android:icon="@mipmap/ic_jvnotif"
         android:roundIcon="@mipmap/ic_jvnotif"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Light.Real">
+        android:theme="@style/AppTheme.Light.Real"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".MainActivity"
