@@ -1,1 +1,2 @@
-# rien
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
