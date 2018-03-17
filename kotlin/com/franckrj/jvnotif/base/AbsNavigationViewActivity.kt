@@ -11,6 +11,8 @@ import android.view.View
 import android.widget.AdapterView
 import com.franckrj.jvnotif.utils.Undeprecator
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.support.v7.app.AlertDialog
 import com.franckrj.jvnotif.AddAnAccountActivity
 import com.franckrj.jvnotif.NavigationMenuAdapter
@@ -198,6 +200,10 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         layoutForDrawer?.addDrawerListener(newToggleForDrawer)
         layoutForDrawer?.setDrawerShadow(R.drawable.shadow_drawer, GravityCompat.START)
         updateNavigationMenu()
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            window.statusBarColor = Color.TRANSPARENT
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
