@@ -9,8 +9,6 @@ import com.franckrj.jvnotif.R
 object PrefsManager {
     val allAutocheckPeriodTimes: LongArray = longArrayOf(900_000,  1_800_000,  3_600_000,  43_200_000, 86_400_000)
 
-    private const val defaultAutocheckPeriodTime: Long = 1_800_000
-
     private var currentPrefs: SharedPreferences? = null
     private var currentPrefsEdit: SharedPreferences.Editor? = null
     private val listOfStringPrefs: SimpleArrayMap<StringPref.Names, StringPref> = SimpleArrayMap()
@@ -30,7 +28,7 @@ object PrefsManager {
         listOfBoolPrefs.put(BoolPref.Names.MP_NOTIF_IS_VISIBLE, BoolPref("pref.mpNotifIsVisible", false))
         listOfBoolPrefs.put(BoolPref.Names.STARS_NOTIF_IS_VISIBLE, BoolPref("pref.starsNotifIsVisible", false))
         listOfIntPrefs.put(IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED, IntPref("pref.numberOfWebviewOpenSinceCacheCleared", 0))
-        listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", defaultAutocheckPeriodTime))
+        listOfLongPrefs.put(LongPref.Names.AUTOCHECK_PERIOD_TIME, LongPref("pref.autocheckPeriodTime", allAutocheckPeriodTimes[1]))
     }
 
     fun getString(prefName: StringPref.Names): String {
