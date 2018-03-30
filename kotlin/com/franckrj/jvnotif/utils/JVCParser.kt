@@ -1,29 +1,26 @@
 package com.franckrj.jvnotif.utils
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 object JVCParser {
-    private val numberOfMpJVCPattern = Pattern.compile("""<div class=".*?account-mp.*?">[^<]*<span[^c]*class="jv-account-number-mp[^"]*".*?data-val="([^"]*)"""", Pattern.DOTALL)
-    private val numberOfStarsJVCPattern = Pattern.compile("<div class=\".*?account-notif.*?\">[^<]*<span[^c]*class=\"jv-account-number-notif[^\"]*\".*?data-val=\"([^\"]*)\"", Pattern.DOTALL)
+    private val numberOfMpJVCPattern = Regex("""<div class=".*?account-mp.*?">[^<]*<span[^c]*class="jv-account-number-mp[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
+    private val numberOfStarsJVCPattern = Regex("""<div class=".*?account-notif.*?">[^<]*<span[^c]*class="jv-account-number-notif[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
 
     fun getNumberOfMpFromPage(pageSource: String): Int {
-        val numberOfMpJVCMatcher: Matcher = numberOfMpJVCPattern.matcher(pageSource)
+        val numberOfMpJVCMatcher: MatchResult? = numberOfMpJVCPattern.find(pageSource)
 
         @Suppress("LiftReturnOrAssignment")
-        if (numberOfMpJVCMatcher.find()) {
-            return numberOfMpJVCMatcher.group(1).toIntOrNull() ?: -1
+        if (numberOfMpJVCMatcher != null) {
+            return numberOfMpJVCMatcher.groupValues[1].toIntOrNull() ?: -1
         } else {
             return -1
         }
     }
 
     fun getNumberOfStarsFromPage(pageSource: String): Int {
-        val numberOfStarsJVCMatcher: Matcher = numberOfStarsJVCPattern.matcher(pageSource)
+        val numberOfStarsJVCMatcher: MatchResult? = numberOfStarsJVCPattern.find(pageSource)
 
         @Suppress("LiftReturnOrAssignment")
-        if (numberOfStarsJVCMatcher.find()) {
-            return numberOfStarsJVCMatcher.group(1).toIntOrNull() ?: -1
+        if (numberOfStarsJVCMatcher != null) {
+            return numberOfStarsJVCMatcher.groupValues[1].toIntOrNull() ?: -1
         } else {
             return -1
         }
