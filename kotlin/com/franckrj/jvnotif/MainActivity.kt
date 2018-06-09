@@ -252,7 +252,7 @@ class MainActivity : AbsNavigationViewActivity() {
                     notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_mp))
                     notifContentView.text = context.getString(R.string.mpNumber, newNotifInfo.notifNumber.toString())
                 } else if (typeOfNotif == NotifInfo.NotifTypeName.STARS) {
-                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_stars))
+                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_bell))
 
                     if (newNotifInfo.notifNumber > 1) {
                         notifContentView.text = context.getString(R.string.starsPluralNumber, newNotifInfo.notifNumber.toString())
