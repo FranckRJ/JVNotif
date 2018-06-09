@@ -117,6 +117,11 @@ class WebBrowserActivity : AbsToolbarActivity() {
         super.onPause()
     }
 
+    override fun onDestroy() {
+        browserWebView?.destroy()
+        super.onDestroy()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu_webbrowser, menu)

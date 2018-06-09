@@ -102,6 +102,11 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
         super.onPause()
     }
 
+    override fun onDestroy() {
+        jvcWebView?.destroy()
+        super.onDestroy()
+    }
+
     override fun onBackPressed() {
         Toast.makeText(this, getString(R.string.warningNotConnected), Toast.LENGTH_LONG).show()
         super.onBackPressed()
