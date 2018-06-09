@@ -141,7 +141,6 @@ class MainActivity : AbsNavigationViewActivity() {
 
         adapterForNotifList = NotifListAdapter(this)
         adapterForNotifList?.onNotifClickedListener = notifInListClickedListener
-        notifList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         notifList.layoutManager = LinearLayoutManager(this)
         notifList.adapter = adapterForNotifList
         swipeRefresh?.setOnRefreshListener(swipeRefreshActivatedListener)
