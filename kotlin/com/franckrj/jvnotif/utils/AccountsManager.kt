@@ -125,10 +125,11 @@ object AccountsManager {
     }
 
     fun addAccount(nickname: String, cookieValue: String) {
-        if (accountsList.firstOrNull { it.nickname.toLowerCase() == nickname.toLowerCase() } == null) {
-            @Suppress("ConvertToStringTemplate")
-            accountsList.add(AccountInfos(nickname, "coniunctio=" + cookieValue))
-        }
+        /* Suppression du compte s'il est déjà présent pour utiliser le nouveau cookie à la place (et le mettre en fin de liste). */
+        accountsList.removeAll { it.nickname.toLowerCase() == nickname.toLowerCase() }
+
+        @Suppress("ConvertToStringTemplate")
+        accountsList.add(AccountInfos(nickname, "coniunctio=" + cookieValue))
     }
 
     fun removeAccount(nicknameToSearch: String) {
