@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -252,7 +251,7 @@ class MainActivity : AbsNavigationViewActivity() {
                     notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_mp))
                     notifContentView.text = context.getString(R.string.mpNumber, newNotifInfo.notifNumber.toString())
                 } else if (typeOfNotif == NotifInfo.NotifTypeName.STARS) {
-                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_bell))
+                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_stars))
 
                     if (newNotifInfo.notifNumber > 1) {
                         notifContentView.text = context.getString(R.string.starsPluralNumber, newNotifInfo.notifNumber.toString())
