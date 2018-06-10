@@ -9,9 +9,9 @@ object AccountsManager {
 
     fun clearNumberOfMpAndStarsForAllAccounts() = accountsList.forEach { it.numberOfMp = 0; it.numberOfStars = 0 }
 
-    fun getNumberOfMpForAllAccounts(): Int = accountsList.sumBy { it.numberOfMp }
+    fun getNumberOfMpForAllAccounts(): Int = accountsList.sumBy { it.numberOfMp.coerceAtLeast(0) }
 
-    fun getNumberOfStarsForAllAccounts(): Int = accountsList.sumBy { it.numberOfStars }
+    fun getNumberOfStarsForAllAccounts(): Int = accountsList.sumBy { it.numberOfStars.coerceAtLeast(0) }
 
     fun getAllNicknamesThatHaveMp(): String = accountsList.filter { it.numberOfMp > 0 }.joinToString(separator = ", ", transform = { it.nickname })
 
@@ -173,9 +173,12 @@ object AccountsManager {
     }
 
     class MpAndStarsNumbers (val mpNumber: Int, val starsNumber: Int) {
-        fun isTotallyInvalid(): Boolean = (mpNumber == -1 && starsNumber == -1)
+        companion object {
+            const val PARSING_ERROR: Int = -1
+            const val NETWORK_ERROR: Int = -2
+        }
 
-        fun invalidNumbersToValidNumbers(): MpAndStarsNumbers = MpAndStarsNumbers(if (mpNumber == -1) 0 else mpNumber, if (starsNumber == -1) 0 else starsNumber)
+        fun thereIsANetworkError(): Boolean = (mpNumber == NETWORK_ERROR && starsNumber == NETWORK_ERROR)
     }
 
     class AccountInfos(val nickname: String, val cookie: String, var numberOfMp: Int = 0, var numberOfStars: Int = 0)

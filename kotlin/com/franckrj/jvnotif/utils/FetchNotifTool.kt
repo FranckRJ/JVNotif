@@ -25,7 +25,7 @@ class FetchNotifTool(val context: Context) {
         const val FETCH_NOTIF_REASON_OK: Int = 0
         const val FETCH_NOTIF_REASON_NO_ACCOUNT: Int = 1
         const val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
-        const val FETCH_NOTIF_REASON_ERROR: Int = 3
+        const val FETCH_NOTIF_REASON_NETWORK_ERROR: Int = 3
     }
 
     private val newNumberOfMpAndStarsReceivedListener = object : GetNumberOfMpAndStarsForAccount.NewNumberOfMpAndStarsReceived {
@@ -37,7 +37,7 @@ class FetchNotifTool(val context: Context) {
             if (listOfCurrentRequests.isEmpty()) {
                 val someMpAndStarsNumberHaveBeenFetched: Boolean = updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_ERROR))
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_NETWORK_ERROR))
             }
         }
     }
@@ -50,11 +50,11 @@ class FetchNotifTool(val context: Context) {
         for (i: Int in 0 until listOfNumberOfMpAndStarsPerAccounts.size()) {
             val currentMpAndStarsInfos: AccountsManager.MpAndStarsNumbers = listOfNumberOfMpAndStarsPerAccounts.valueAt(i)
 
-            if (!currentMpAndStarsInfos.isTotallyInvalid()) {
+            if (!currentMpAndStarsInfos.thereIsANetworkError()) {
                 someMpAndStarsNumberHaveBeenFetched = true
             }
 
-            AccountsManager.setNumberOfMpAndStars(listOfNumberOfMpAndStarsPerAccounts.keyAt(i), currentMpAndStarsInfos.invalidNumbersToValidNumbers())
+            AccountsManager.setNumberOfMpAndStars(listOfNumberOfMpAndStarsPerAccounts.keyAt(i), currentMpAndStarsInfos)
         }
 
         /* ------------ MP */
@@ -174,10 +174,10 @@ class FetchNotifTool(val context: Context) {
             } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)
 
             @Suppress("LiftReturnOrAssignment")
-            if (pageContent != null) {
-                return AccountsManager.MpAndStarsNumbers(JVCParser.getNumberOfMpFromPage(pageContent), JVCParser.getNumberOfStarsFromPage(pageContent))
+            if (pageContent != null && pageContent.isNotEmpty()) {
+                return JVCParser.getMpAndStarsNumbersFromPage(pageContent)
             } else {
-                return AccountsManager.MpAndStarsNumbers(-1, -1)
+                return AccountsManager.MpAndStarsNumbers(AccountsManager.MpAndStarsNumbers.NETWORK_ERROR, AccountsManager.MpAndStarsNumbers.NETWORK_ERROR)
             }
         }
 

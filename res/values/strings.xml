@@ -47,7 +47,11 @@
     <string name="every24hours">Toutes les 24 heures</string>
     <string name="checkForNewMpAndStars">Vérifier les nouvelles notifs</string>
     <string name="checkForNewMpAndStarsWithInfos"><![CDATA[Vérifier les nouvelles notifs<br><small><font color="grey">%1$s</font></small>]]></string>
-    <string name="errorDuringFetchOfMpAndStars">Erreur durant la récupération des notifs.</string>
+    <string name="errorDuringFetchOfMpAndStars">Erreur durant la récupération des notifs, impossible d\'accéder à jeuxvideo.com. Veuillez vérifier votre connexion internet.</string>
+    <string name="errorDetailedNoNetwork">Erreur, impossible d\'accéder à jeuxvideo.com pour récupérer les informations nécessaires. Veuillez ressayer.</string>
+    <string name="errorDetailedParsingAll">Erreur, impossible de récupérer les informations nécessaires sur la page de jeuxvideo.com. Veuillez vérifier que votre compte est toujours valide (en consultant vos MP / notifs via le menu latéral), sinon supprimez-le puis rajoutez-le à nouveau. Vérifiez aussi si une mise à jour de l\'application n\'est pas disponible.</string>
+    <string name="errorDetailedParsingMp">Erreur, impossible de récupérer les informations nécessaires à propos des MP sur la page de jeuxvideo.com. Veuillez vérifier si une mise à jour de l\'application n\'est pas disponible.</string>
+    <string name="errorDetailedParsingStars">Erreur, impossible de récupérer les informations nécessaires à propos des notifs sur la page de jeuxvideo.com. Veuillez vérifier si une mise à jour de l\'application n\'est pas disponible.</string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>

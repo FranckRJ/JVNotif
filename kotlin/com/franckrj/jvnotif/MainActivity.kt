@@ -83,7 +83,7 @@ class MainActivity : AbsNavigationViewActivity() {
                             FetchNotifTool.FETCH_NOTIF_REASON_NO_ACCOUNT -> {
                                 notifInfoText?.setText(R.string.connectToZeroAccount)
                             }
-                            FetchNotifTool.FETCH_NOTIF_REASON_ERROR -> {
+                            FetchNotifTool.FETCH_NOTIF_REASON_NETWORK_ERROR -> {
                                 notifInfoText?.setText(R.string.errorDuringFetchOfMpAndStars)
                             }
                             else -> {
@@ -97,6 +97,7 @@ class MainActivity : AbsNavigationViewActivity() {
     }
 
     private fun setNotifListToCurrentNotifsAndUpdateInfoVisibility() {
+        var numberOfAccountsWithNetworkError: Int = 0
         val newListOfNotifs: ArrayList<NotifListAdapter.NotifInfo> = ArrayList()
         AccountsManager.getListOfAccounts().forEach {
                                                 if (it.numberOfMp > 0) {
@@ -105,8 +106,23 @@ class MainActivity : AbsNavigationViewActivity() {
                                                 if (it.numberOfStars > 0) {
                                                     newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.STARS, it.numberOfStars))
                                                 }
+
+                                                if (it.numberOfMp == AccountsManager.MpAndStarsNumbers.NETWORK_ERROR && it.numberOfStars == AccountsManager.MpAndStarsNumbers.NETWORK_ERROR) {
+                                                    ++numberOfAccountsWithNetworkError
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.ERROR_NETWORK, 0))
+                                                } else if (it.numberOfMp == AccountsManager.MpAndStarsNumbers.PARSING_ERROR && it.numberOfStars == AccountsManager.MpAndStarsNumbers.PARSING_ERROR) {
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.ERROR_PARSING_ALL, 0))
+                                                } else if (it.numberOfMp == AccountsManager.MpAndStarsNumbers.PARSING_ERROR) {
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.ERROR_PARSING_MP, 0))
+                                                } else if (it.numberOfStars == AccountsManager.MpAndStarsNumbers.PARSING_ERROR) {
+                                                    newListOfNotifs.add(NotifListAdapter.NotifInfo(it.nickname, NotifListAdapter.NotifInfo.NotifTypeName.ERROR_PARSING_STARS, 0))
+                                                }
                                             }
-        adapterForNotifList?.listOfNotifs = newListOfNotifs
+
+        /* On affiche la liste uniquement si certains comptes n'ont pas d'erreur réseau, car sinon le message d'erreur est affiché en background et non dans la liste. */
+        if (numberOfAccountsWithNetworkError < AccountsManager.getListOfAccounts().size) {
+            adapterForNotifList?.listOfNotifs = newListOfNotifs
+        }
 
         if ((adapterForNotifList?.itemCount ?: 0) > 0) {
             notifInfoText?.visibility = View.GONE
@@ -184,7 +200,7 @@ class MainActivity : AbsNavigationViewActivity() {
         /* On màj dans le onResume parce que c'est plus simple (même si moins logique) de le faire ici qu'à chaque fois quand :
          *     - on créé l'activité
          *     - on ajoute un compte
-         *     - on lit les MP / Stars depuis accountWithMpList
+         *     - on lit les MP / Stars depuis notifList
          *     - on lit les MP / Stars via le menu latéral
          */
         setNotifListToCurrentNotifsAndUpdateInfoVisibility()
@@ -234,6 +250,7 @@ class MainActivity : AbsNavigationViewActivity() {
             private val notifIconView: ImageView = mainView.findViewById(R.id.icon_notif_row)
             private val notifNicknameView: TextView = mainView.findViewById(R.id.nickname_notif_row)
             private val notifContentView: TextView = mainView.findViewById(R.id.content_notif_row)
+            private val notifErrorTextView: TextView = mainView.findViewById(R.id.errortext_notif_row)
             private var typeOfNotif: NotifInfo.NotifTypeName = NotifInfo.NotifTypeName.INVALID
 
             init {
@@ -247,16 +264,44 @@ class MainActivity : AbsNavigationViewActivity() {
                 typeOfNotif = newNotifInfo.notifType
                 notifNicknameView.text = newNotifInfo.nickname
 
-                if (typeOfNotif == NotifInfo.NotifTypeName.MP) {
-                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_mp))
-                    notifContentView.text = context.getString(R.string.mpNumber, newNotifInfo.notifNumber.toString())
-                } else if (typeOfNotif == NotifInfo.NotifTypeName.STARS) {
-                    notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_stars))
+                when (typeOfNotif) {
+                    NotifInfo.NotifTypeName.MP -> {
+                        notifErrorTextView.visibility = View.GONE
+                        notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_mp))
+                        notifContentView.text = context.getString(R.string.mpNumber, newNotifInfo.notifNumber.toString())
+                    }
+                    NotifInfo.NotifTypeName.STARS -> {
+                        notifErrorTextView.visibility = View.GONE
+                        notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_stars))
 
-                    if (newNotifInfo.notifNumber > 1) {
-                        notifContentView.text = context.getString(R.string.starsPluralNumber, newNotifInfo.notifNumber.toString())
-                    } else {
-                        notifContentView.text = context.getString(R.string.starsSingularNumber, newNotifInfo.notifNumber.toString())
+                        if (newNotifInfo.notifNumber > 1) {
+                            notifContentView.text = context.getString(R.string.starsPluralNumber, newNotifInfo.notifNumber.toString())
+                        } else {
+                            notifContentView.text = context.getString(R.string.starsSingularNumber, newNotifInfo.notifNumber.toString())
+                        }
+                    }
+                    else -> {
+                        notifErrorTextView.visibility = View.VISIBLE
+                        notifIconView.setImageDrawable(Undeprecator.resourcesGetDrawable(context.resources, R.drawable.ic_error))
+                        notifContentView.text = ""
+
+                        when (typeOfNotif) {
+                            NotifInfo.NotifTypeName.ERROR_NETWORK -> {
+                                notifErrorTextView.text = context.getText(R.string.errorDetailedNoNetwork)
+                            }
+                            NotifInfo.NotifTypeName.ERROR_PARSING_ALL -> {
+                                notifErrorTextView.text = context.getText(R.string.errorDetailedParsingAll)
+                            }
+                            NotifInfo.NotifTypeName.ERROR_PARSING_MP -> {
+                                notifErrorTextView.text = context.getText(R.string.errorDetailedParsingMp)
+                            }
+                            NotifInfo.NotifTypeName.ERROR_PARSING_STARS -> {
+                                notifErrorTextView.text = context.getText(R.string.errorDetailedParsingStars)
+                            }
+                            else -> {
+                                notifErrorTextView.text = ""
+                            }
+                        }
                     }
                 }
             }
@@ -268,7 +313,7 @@ class MainActivity : AbsNavigationViewActivity() {
 
         class NotifInfo(val nickname: String, val notifType: NotifTypeName, val notifNumber: Int) {
             enum class NotifTypeName {
-                INVALID, MP, STARS
+                INVALID, MP, STARS, ERROR_NETWORK, ERROR_PARSING_ALL, ERROR_PARSING_MP, ERROR_PARSING_STARS
             }
         }
     }
