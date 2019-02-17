@@ -6,8 +6,8 @@ import android.widget.BaseAdapter
 import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.support.annotation.ColorInt
-import android.support.annotation.DrawableRes
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView

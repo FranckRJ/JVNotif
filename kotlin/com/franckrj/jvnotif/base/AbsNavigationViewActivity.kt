@@ -3,9 +3,9 @@ package com.franckrj.jvnotif.base
 import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.ActionBarDrawerToggle
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
@@ -13,7 +13,7 @@ import com.franckrj.jvnotif.utils.Undeprecator
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.franckrj.jvnotif.AddAnAccountActivity
 import com.franckrj.jvnotif.NavigationMenuAdapter
 import com.franckrj.jvnotif.NavigationMenuListView

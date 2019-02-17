@@ -3,8 +3,8 @@ package com.franckrj.jvnotif.utils
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.util.SimpleArrayMap
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.collection.SimpleArrayMap
 import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.R
 

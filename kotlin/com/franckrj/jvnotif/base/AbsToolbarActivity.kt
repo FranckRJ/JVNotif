@@ -1,8 +1,8 @@
 package com.franckrj.jvnotif.base
 
-import android.support.annotation.IdRes
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
 abstract class AbsToolbarActivity: AppCompatActivity() {
     protected fun initToolbar(@IdRes idOfToolbar: Int) {

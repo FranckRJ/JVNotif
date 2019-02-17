@@ -1,6 +1,6 @@
 package com.franckrj.jvnotif.utils
 
-import android.support.v4.util.SimpleArrayMap
+import androidx.collection.SimpleArrayMap
 
 object AccountsManager {
     private val accountsList: ArrayList<AccountInfos> = ArrayList()

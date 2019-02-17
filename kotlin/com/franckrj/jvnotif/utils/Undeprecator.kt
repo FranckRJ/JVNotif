@@ -3,9 +3,9 @@ package com.franckrj.jvnotif.utils
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.text.Html

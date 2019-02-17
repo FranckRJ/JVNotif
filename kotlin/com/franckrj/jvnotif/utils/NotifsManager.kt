@@ -8,10 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
-import android.support.annotation.ColorInt
-import android.support.annotation.DrawableRes
-import android.support.v4.app.NotificationCompat
-import android.support.v4.util.SimpleArrayMap
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.core.app.NotificationCompat
+import androidx.collection.SimpleArrayMap
 import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.NotificationDismissedReceiver
 import com.franckrj.jvnotif.R
