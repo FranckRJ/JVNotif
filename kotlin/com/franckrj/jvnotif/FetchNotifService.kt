@@ -43,7 +43,7 @@ class FetchNotifService : Service() {
     override fun onCreate() {
         super.onCreate()
         val powerManager: PowerManager = (getSystemService(Context.POWER_SERVICE) as PowerManager)
-        wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FetchNotifService")
+        wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "JVNotif:FetchNotifService")
         wakelock?.acquire(FetchNotifTool.wakeLockTimeout)
         toolForFetchNotif.fetchNotifIsFinishedListener = fetchNotifIsFinishedListener
     }
