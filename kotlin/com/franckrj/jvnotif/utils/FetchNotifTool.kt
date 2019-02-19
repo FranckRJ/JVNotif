@@ -167,8 +167,7 @@ class FetchNotifTool(val context: Context) {
             currentWebInfos.useBiggerTimeoutTime = false
 
             do {
-                /* TODO: Check pour changer le lien de la requête (si besoin). */
-                pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/sso/settings.php", "GET", "", cookie, currentWebInfos)
+                pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/mailform.php", "GET", "", cookie, currentWebInfos)
                 numberOfTrysRemaining -= 1
                 currentWebInfos.useBiggerTimeoutTime = true
             } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)
