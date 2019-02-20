@@ -21,7 +21,7 @@ import com.franckrj.jvnotif.R
 import com.franckrj.jvnotif.dialogs.AccountMenuDialogFragment
 import com.franckrj.jvnotif.dialogs.AutocheckPeriodTimePickerDialogFragment
 import com.franckrj.jvnotif.utils.AccountsManager
-import com.franckrj.jvnotif.utils.InitShedulesManager
+import com.franckrj.jvnotif.utils.WorkerShedulesManager
 import com.franckrj.jvnotif.utils.PrefsManager
 
 abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialogFragment.AskForDeleteAccount, AutocheckPeriodTimePickerDialogFragment.NewCheckPeriodTimePicked {
@@ -254,7 +254,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         PrefsManager.applyChanges()
 
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            InitShedulesManager.initSchedulers(this)
+            WorkerShedulesManager.initSchedulers(true)
         }
 
         updateNavigationMenu()

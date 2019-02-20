@@ -4,7 +4,7 @@ import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
 import com.franckrj.jvnotif.utils.AccountsManager
-import com.franckrj.jvnotif.utils.InitShedulesManager
+import com.franckrj.jvnotif.utils.WorkerShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 
 class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
@@ -18,7 +18,7 @@ class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, context)
 
             if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-                InitShedulesManager.initSchedulers(context)
+                WorkerShedulesManager.initSchedulers()
             }
         }
     }

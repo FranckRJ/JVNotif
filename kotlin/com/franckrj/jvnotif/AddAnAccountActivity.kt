@@ -13,7 +13,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.franckrj.jvnotif.base.AbsHomeIsBackActivity
 import com.franckrj.jvnotif.utils.AccountsManager
-import com.franckrj.jvnotif.utils.InitShedulesManager
+import com.franckrj.jvnotif.utils.WorkerShedulesManager
 import com.franckrj.jvnotif.utils.PrefsManager
 import com.franckrj.jvnotif.utils.Undeprecator
 import com.franckrj.jvnotif.utils.Utils
@@ -42,7 +42,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
                     Toast.makeText(this@AddAnAccountActivity, R.string.connectionSuccessful, Toast.LENGTH_SHORT).show()
 
-                    InitShedulesManager.initSchedulers(this@AddAnAccountActivity)
+                    WorkerShedulesManager.initSchedulers()
 
                     finish()
                     return

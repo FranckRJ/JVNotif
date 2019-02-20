@@ -1,21 +1,22 @@
-package com.franckrj.jvnotif.utils
+package com.franckrj.jvnotif
 
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.collection.SimpleArrayMap
-import com.franckrj.jvnotif.MainActivity
-import com.franckrj.jvnotif.R
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import com.franckrj.jvnotif.utils.AccountsManager
+import com.franckrj.jvnotif.utils.JVCParser
+import com.franckrj.jvnotif.utils.NotifsManager
+import com.franckrj.jvnotif.utils.PrefsManager
+import com.franckrj.jvnotif.utils.WebManager
 import java.util.concurrent.atomic.AtomicLong
 
-class FetchNotifTool(val context: Context) {
-    private val listOfCurrentRequests: ArrayList<GetNumberOfMpAndStarsForAccount> = ArrayList()
+class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(context, params) {
     private val listOfNumberOfMpAndStarsPerAccounts: SimpleArrayMap<String, AccountsManager.MpAndStarsNumbers> = SimpleArrayMap()
-    var fetchNotifIsFinishedListener: FetchNotifIsFinished? = null
 
     companion object {
-        const val wakeLockTimeout: Long = 120_000
         const val ACTION_FETCH_NOTIF_STATE_CHANGED: String = "ACTION_FETCH_NOTIF_STATE_CHANGED"
         const val EXTRA_NEW_FETCH_NOTIF_STATE: String = "EXTRA_NEW_FETCH_NOTIF_STATE"
         const val EXTRA_FETCH_NOTIF_STATE_REASON: String = "EXTRA_FETCH_NOTIF_STATE_REASON"
@@ -35,17 +36,25 @@ class FetchNotifTool(val context: Context) {
         }
     }
 
-    private val newNumberOfMpAndStarsReceivedListener = object : GetNumberOfMpAndStarsForAccount.NewNumberOfMpAndStarsReceived {
-        override fun onReceiveNewNumberOfMpAndStars(nicknameOfAccount: String, infoForMpAndStars: AccountsManager.MpAndStarsNumbers, getter: GetNumberOfMpAndStarsForAccount) {
-            listOfCurrentRequests.remove(getter)
-            listOfNumberOfMpAndStarsPerAccounts.put(nicknameOfAccount, infoForMpAndStars)
+    private fun downloadNumberOfMpAndStarsForAccount(cookie: String): AccountsManager.MpAndStarsNumbers {
+        val currentWebInfos = WebManager.WebInfos()
+        var pageContent: String?
+        var numberOfTrysRemaining: Int = 2
 
-            /* Une fois que toutes les requêtes sont terminées on affiche une notif. */
-            if (listOfCurrentRequests.isEmpty()) {
-                val someMpAndStarsNumberHaveBeenFetched: Boolean = updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded()
-                fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
-                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_NETWORK_ERROR))
-            }
+        currentWebInfos.followRedirects = false
+        currentWebInfos.useBiggerTimeoutTime = false
+
+        do {
+            pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/mailform.php", "GET", "", cookie, currentWebInfos)
+            numberOfTrysRemaining -= 1
+            currentWebInfos.useBiggerTimeoutTime = true
+        } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)
+
+        @Suppress("LiftReturnOrAssignment")
+        if (pageContent != null && pageContent.isNotEmpty()) {
+            return JVCParser.getMpAndStarsNumbersFromPage(pageContent)
+        } else {
+            return AccountsManager.MpAndStarsNumbers(AccountsManager.MpAndStarsNumbers.NETWORK_ERROR, AccountsManager.MpAndStarsNumbers.NETWORK_ERROR)
         }
     }
 
@@ -70,7 +79,7 @@ class FetchNotifTool(val context: Context) {
             /* Aucun mp non lu. */
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.MP_NOTIF_ID, context)
         } else if (AccountsManager.thereIsNewMpSinceLastSavedInfos() ||
-                   !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
+                !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE)) {
             /* Nouveaux mp non lu ou même nombre qu'avant (et supérieur à 0)
              * mais comme la notif a été effacée on l'affiche de nouveau. */
             if (!MainActivity.isTheActiveActivity) {
@@ -96,7 +105,7 @@ class FetchNotifTool(val context: Context) {
             /* Aucune star non vue. */
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, context)
         } else if (AccountsManager.thereIsNewStarsSinceLastSavedInfos() ||
-                   !PrefsManager.getBool(PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)) {
+                !PrefsManager.getBool(PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)) {
             /* Nouvelles stars non vues ou même nombre qu'avant (et supérieur à 0)
              * mais comme la notif a été effacée on l'affiche de nouveau. */
             if (!MainActivity.isTheActiveActivity) {
@@ -128,10 +137,11 @@ class FetchNotifTool(val context: Context) {
         LocalBroadcastManager.getInstance(context).sendBroadcast(fetchNotifStateChangedIntent)
     }
 
-    fun startFetchNotif() {
+    /* TODO: Gérer au moins un peu le isStopped. */
+    override fun doWork(): Result {
         broadcastCurrentFetchState(FETCH_NOTIF_STATE_STARTED)
 
-        if (listOfCurrentRequests.isEmpty() && (lastTimeLaunched.get() < (System.currentTimeMillis() - 60_000))) {
+        if (lastTimeLaunched.get() < (System.currentTimeMillis() - 60_000)) {
             // pas très beau mais il faut que ce soit fait le plus tôt possible.
             lastTimeLaunched.set(System.currentTimeMillis())
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
@@ -139,67 +149,19 @@ class FetchNotifTool(val context: Context) {
             listOfNumberOfMpAndStarsPerAccounts.clear()
 
             if (listOfAccounts.isNotEmpty()) {
+                @Suppress("JoinDeclarationAndAssignment")
+                val someMpAndStarsNumberHaveBeenFetched: Boolean
                 for (account in listOfAccounts) {
-                    val newRequest = GetNumberOfMpAndStarsForAccount(account.nickname, account.cookie)
-
-                    listOfCurrentRequests.add(newRequest)
-                    newRequest.numberOfMpAndStarsListener = newNumberOfMpAndStarsReceivedListener
-                    newRequest.execute()
+                    listOfNumberOfMpAndStarsPerAccounts.put(account.nickname, downloadNumberOfMpAndStarsForAccount(account.cookie))
                 }
+                someMpAndStarsNumberHaveBeenFetched = updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded()
+                broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_NETWORK_ERROR))
             } else {
                 broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_NO_ACCOUNT)
             }
         } else {
             broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_ALREADY_RUNNING)
         }
-    }
-
-    fun stopFetchNotif() {
-        val iterator: MutableListIterator<GetNumberOfMpAndStarsForAccount> = listOfCurrentRequests.listIterator()
-        while (iterator.hasNext()) {
-            val currentRequest: GetNumberOfMpAndStarsForAccount = iterator.next()
-            currentRequest.numberOfMpAndStarsListener = null
-            currentRequest.cancel(false)
-            iterator.remove()
-        }
-    }
-
-    private class GetNumberOfMpAndStarsForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, AccountsManager.MpAndStarsNumbers>() {
-        var numberOfMpAndStarsListener: NewNumberOfMpAndStarsReceived? = null
-
-        override fun doInBackground(vararg param: Void?): AccountsManager.MpAndStarsNumbers {
-            val currentWebInfos = WebManager.WebInfos()
-            var pageContent: String?
-            var numberOfTrysRemaining: Int = 2
-
-            currentWebInfos.followRedirects = false
-            currentWebInfos.useBiggerTimeoutTime = false
-
-            do {
-                pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/mailform.php", "GET", "", cookie, currentWebInfos)
-                numberOfTrysRemaining -= 1
-                currentWebInfos.useBiggerTimeoutTime = true
-            } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)
-
-            @Suppress("LiftReturnOrAssignment")
-            if (pageContent != null && pageContent.isNotEmpty()) {
-                return JVCParser.getMpAndStarsNumbersFromPage(pageContent)
-            } else {
-                return AccountsManager.MpAndStarsNumbers(AccountsManager.MpAndStarsNumbers.NETWORK_ERROR, AccountsManager.MpAndStarsNumbers.NETWORK_ERROR)
-            }
-        }
-
-        override fun onPostExecute(result: AccountsManager.MpAndStarsNumbers) {
-            super.onPostExecute(result)
-            numberOfMpAndStarsListener?.onReceiveNewNumberOfMpAndStars(nickname, result, this)
-        }
-
-        interface NewNumberOfMpAndStarsReceived {
-            fun onReceiveNewNumberOfMpAndStars(nicknameOfAccount: String, infoForMpAndStars: AccountsManager.MpAndStarsNumbers, getter: GetNumberOfMpAndStarsForAccount)
-        }
-    }
-
-    interface FetchNotifIsFinished {
-        fun onFetchNotifIsFinished()
+        return Result.success()
     }
 }

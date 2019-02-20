@@ -17,8 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
-import com.franckrj.jvnotif.utils.FetchNotifTool
-import com.franckrj.jvnotif.utils.InitShedulesManager
+import com.franckrj.jvnotif.utils.WorkerShedulesManager
 import com.franckrj.jvnotif.utils.NotifsManager
 import com.franckrj.jvnotif.utils.PrefsManager
 import com.franckrj.jvnotif.utils.Undeprecator
@@ -45,8 +44,8 @@ class MainActivity : AbsNavigationViewActivity() {
     @Suppress("ObjectLiteralToLambda")
     private val swipeRefreshActivatedListener = object : SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
-            FetchNotifTool.resetLastTimeLaunched()
-            startService(Intent(this@MainActivity, FetchNotifService::class.java))
+            FetchNotifWorker.resetLastTimeLaunched()
+            WorkerShedulesManager.launchNow()
         }
     }
 
@@ -66,25 +65,25 @@ class MainActivity : AbsNavigationViewActivity() {
 
     private val fetchNotifStateChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val newFetchNotifState: Int = intent.getIntExtra(FetchNotifTool.EXTRA_NEW_FETCH_NOTIF_STATE, FetchNotifTool.FETCH_NOTIF_STATE_INVALID)
-            val reasonForState: Int = intent.getIntExtra(FetchNotifTool.EXTRA_FETCH_NOTIF_STATE_REASON, FetchNotifTool.FETCH_NOTIF_REASON_NO_REASON)
+            val newFetchNotifState: Int = intent.getIntExtra(FetchNotifWorker.EXTRA_NEW_FETCH_NOTIF_STATE, FetchNotifWorker.FETCH_NOTIF_STATE_INVALID)
+            val reasonForState: Int = intent.getIntExtra(FetchNotifWorker.EXTRA_FETCH_NOTIF_STATE_REASON, FetchNotifWorker.FETCH_NOTIF_REASON_NO_REASON)
 
             when (newFetchNotifState) {
-                FetchNotifTool.FETCH_NOTIF_STATE_STARTED -> {
+                FetchNotifWorker.FETCH_NOTIF_STATE_STARTED -> {
                     swipeRefresh?.isRefreshing = true
                     notifInfoText?.visibility = View.GONE
                     adapterForNotifList?.listOfNotifs = ArrayList()
                 }
-                FetchNotifTool.FETCH_NOTIF_STATE_FINISHED -> {
-                    if (reasonForState != FetchNotifTool.FETCH_NOTIF_REASON_ALREADY_RUNNING) {
+                FetchNotifWorker.FETCH_NOTIF_STATE_FINISHED -> {
+                    if (reasonForState != FetchNotifWorker.FETCH_NOTIF_REASON_ALREADY_RUNNING) {
                         swipeRefresh?.isRefreshing = false
                         setNotifListToCurrentNotifsAndUpdateInfoVisibility()
 
                         when (reasonForState) {
-                            FetchNotifTool.FETCH_NOTIF_REASON_NO_ACCOUNT -> {
+                            FetchNotifWorker.FETCH_NOTIF_REASON_NO_ACCOUNT -> {
                                 notifInfoText?.setText(R.string.connectToZeroAccount)
                             }
-                            FetchNotifTool.FETCH_NOTIF_REASON_NETWORK_ERROR -> {
+                            FetchNotifWorker.FETCH_NOTIF_REASON_NETWORK_ERROR -> {
                                 notifInfoText?.setText(R.string.errorDuringFetchOfMpAndStars)
                             }
                             else -> {
@@ -163,18 +162,10 @@ class MainActivity : AbsNavigationViewActivity() {
         swipeRefresh?.setColorSchemeResources(R.color.colorAccent)
 
         if (savedInstanceState == null) {
-            val openedFromNotif: Boolean = consumeIntent(intent)
+            FetchNotifWorker.resetLastTimeLaunched()
+            WorkerShedulesManager.launchNow()
 
-            FetchNotifTool.resetLastTimeLaunched()
-            startService(Intent(this, FetchNotifService::class.java))
-
-            /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si une notif
-             * était visible, parce que dans ce cas ils étaient forcément déjà initialisés. */
-            if (AccountsManager.getListOfAccounts().isNotEmpty() && !openedFromNotif &&
-                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.MP_NOTIF_IS_VISIBLE) &&
-                    !PrefsManager.getBool(PrefsManager.BoolPref.Names.STARS_NOTIF_IS_VISIBLE)) {
-                InitShedulesManager.initSchedulers(this)
-            }
+            WorkerShedulesManager.initSchedulers()
         } else {
             val currentNotifInfoText: String? = savedInstanceState.getString(SAVE_NOTIF_INFO_TEXT, null)
 
@@ -197,7 +188,7 @@ class MainActivity : AbsNavigationViewActivity() {
         isTheActiveActivity = true
 
         LocalBroadcastManager.getInstance(this)
-                             .registerReceiver(fetchNotifStateChangedReceiver, IntentFilter(FetchNotifTool.ACTION_FETCH_NOTIF_STATE_CHANGED))
+                             .registerReceiver(fetchNotifStateChangedReceiver, IntentFilter(FetchNotifWorker.ACTION_FETCH_NOTIF_STATE_CHANGED))
 
         /* On màj dans le onResume parce que c'est plus simple (même si moins logique) de le faire ici qu'à chaque fois quand :
          *     - on créé l'activité
