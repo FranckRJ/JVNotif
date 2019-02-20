@@ -11,7 +11,7 @@ import com.franckrj.jvnotif.utils.JVCParser
 import com.franckrj.jvnotif.utils.NotifsManager
 import com.franckrj.jvnotif.utils.PrefsManager
 import com.franckrj.jvnotif.utils.WebManager
-import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
 
 class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(context, params) {
     private val listOfNumberOfMpAndStarsPerAccounts: SimpleArrayMap<String, AccountsManager.MpAndStarsNumbers> = SimpleArrayMap()
@@ -29,11 +29,7 @@ class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(
         const val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
         const val FETCH_NOTIF_REASON_NETWORK_ERROR: Int = 3
 
-        private var lastTimeLaunched: AtomicLong = AtomicLong(0)
-
-        fun resetLastTimeLaunched() {
-            lastTimeLaunched.set(0)
-        }
+        private val lock: ReentrantLock = ReentrantLock()
     }
 
     private fun downloadNumberOfMpAndStarsForAccount(cookie: String): AccountsManager.MpAndStarsNumbers {
@@ -141,9 +137,7 @@ class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(
     override fun doWork(): Result {
         broadcastCurrentFetchState(FETCH_NOTIF_STATE_STARTED)
 
-        if (lastTimeLaunched.get() < (System.currentTimeMillis() - 60_000)) {
-            // pas très beau mais il faut que ce soit fait le plus tôt possible.
-            lastTimeLaunched.set(System.currentTimeMillis())
+        if (lock.tryLock()) {
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
             listOfNumberOfMpAndStarsPerAccounts.clear()
@@ -159,6 +153,7 @@ class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(
             } else {
                 broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_NO_ACCOUNT)
             }
+            lock.unlock()
         } else {
             broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_ALREADY_RUNNING)
         }

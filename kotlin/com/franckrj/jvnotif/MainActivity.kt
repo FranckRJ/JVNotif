@@ -44,7 +44,6 @@ class MainActivity : AbsNavigationViewActivity() {
     @Suppress("ObjectLiteralToLambda")
     private val swipeRefreshActivatedListener = object : SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
-            FetchNotifWorker.resetLastTimeLaunched()
             WorkerShedulesManager.launchNow()
         }
     }
@@ -162,7 +161,6 @@ class MainActivity : AbsNavigationViewActivity() {
         swipeRefresh?.setColorSchemeResources(R.color.colorAccent)
 
         if (savedInstanceState == null) {
-            FetchNotifWorker.resetLastTimeLaunched()
             WorkerShedulesManager.launchNow()
 
             WorkerShedulesManager.initSchedulers()
