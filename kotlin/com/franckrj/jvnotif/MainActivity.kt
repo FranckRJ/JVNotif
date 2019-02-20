@@ -45,6 +45,7 @@ class MainActivity : AbsNavigationViewActivity() {
     @Suppress("ObjectLiteralToLambda")
     private val swipeRefreshActivatedListener = object : SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
+            FetchNotifTool.resetLastTimeLaunched()
             startService(Intent(this@MainActivity, FetchNotifService::class.java))
         }
     }
@@ -164,6 +165,7 @@ class MainActivity : AbsNavigationViewActivity() {
         if (savedInstanceState == null) {
             val openedFromNotif: Boolean = consumeIntent(intent)
 
+            FetchNotifTool.resetLastTimeLaunched()
             startService(Intent(this, FetchNotifService::class.java))
 
             /* On n'initialise pas les schedulers si on a ouvert l'appli via une notif ou si une notif

@@ -7,7 +7,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.collection.SimpleArrayMap
 import com.franckrj.jvnotif.MainActivity
 import com.franckrj.jvnotif.R
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 class FetchNotifTool(val context: Context) {
     private val listOfCurrentRequests: ArrayList<GetNumberOfMpAndStarsForAccount> = ArrayList()
@@ -28,7 +28,11 @@ class FetchNotifTool(val context: Context) {
         const val FETCH_NOTIF_REASON_ALREADY_RUNNING: Int = 2
         const val FETCH_NOTIF_REASON_NETWORK_ERROR: Int = 3
 
-        private var alreadyRunning: AtomicBoolean = AtomicBoolean(false)
+        private var lastTimeLaunched: AtomicLong = AtomicLong(0)
+
+        fun resetLastTimeLaunched() {
+            lastTimeLaunched.set(0)
+        }
     }
 
     private val newNumberOfMpAndStarsReceivedListener = object : GetNumberOfMpAndStarsForAccount.NewNumberOfMpAndStarsReceived {
@@ -41,7 +45,6 @@ class FetchNotifTool(val context: Context) {
                 val someMpAndStarsNumberHaveBeenFetched: Boolean = updateMpAndStarsNumberOfAccountsAndShowThingsIfNeeded()
                 fetchNotifIsFinishedListener?.onFetchNotifIsFinished()
                 broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, (if (someMpAndStarsNumberHaveBeenFetched) FETCH_NOTIF_REASON_OK else FETCH_NOTIF_REASON_NETWORK_ERROR))
-                alreadyRunning.set(false)
             }
         }
     }
@@ -128,7 +131,9 @@ class FetchNotifTool(val context: Context) {
     fun startFetchNotif() {
         broadcastCurrentFetchState(FETCH_NOTIF_STATE_STARTED)
 
-        if (listOfCurrentRequests.isEmpty() && !alreadyRunning.getAndSet(true)) {
+        if (listOfCurrentRequests.isEmpty() && (lastTimeLaunched.get() < (System.currentTimeMillis() - 60_000))) {
+            // pas très beau mais il faut que ce soit fait le plus tôt possible.
+            lastTimeLaunched.set(System.currentTimeMillis())
             val listOfAccounts: List<AccountsManager.AccountInfos> = AccountsManager.getListOfAccounts()
 
             listOfNumberOfMpAndStarsPerAccounts.clear()
@@ -143,7 +148,6 @@ class FetchNotifTool(val context: Context) {
                 }
             } else {
                 broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_NO_ACCOUNT)
-                alreadyRunning.set(false)
             }
         } else {
             broadcastCurrentFetchState(FETCH_NOTIF_STATE_FINISHED, FETCH_NOTIF_REASON_ALREADY_RUNNING)
@@ -158,7 +162,6 @@ class FetchNotifTool(val context: Context) {
             currentRequest.cancel(false)
             iterator.remove()
         }
-        alreadyRunning.set(false)
     }
 
     private class GetNumberOfMpAndStarsForAccount(val nickname: String, val cookie: String) : AsyncTask<Void, Void, AccountsManager.MpAndStarsNumbers>() {
