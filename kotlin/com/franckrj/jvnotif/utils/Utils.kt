@@ -34,6 +34,6 @@ object Utils {
     }
 
     fun suppressNotifForCookieUsageInWebview() {
-        CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", "wbCookieNotifier=1")
+        CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", "euconsent=set")
     }
 }
