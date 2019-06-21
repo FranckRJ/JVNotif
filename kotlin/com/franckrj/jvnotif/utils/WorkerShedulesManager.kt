@@ -1,5 +1,6 @@
 package com.franckrj.jvnotif.utils
 
+import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -10,16 +11,16 @@ import com.franckrj.jvnotif.FetchNotifWorker
 import java.util.concurrent.TimeUnit
 
 object WorkerShedulesManager {
-    fun initSchedulers(resetSchedules: Boolean = false) {
+    fun initSchedulers(context: Context, resetSchedules: Boolean = false) {
         val fetchNotifConstraints: Constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         val fetchNotifRequest = PeriodicWorkRequestBuilder<FetchNotifWorker>(PrefsManager.getLong(PrefsManager.LongPref.Names.AUTOCHECK_PERIOD_TIME), TimeUnit.MILLISECONDS)
                                 .setConstraints(fetchNotifConstraints)
                                 .build()
-        WorkManager.getInstance().enqueueUniquePeriodicWork("jvnotif", (if (resetSchedules) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP), fetchNotifRequest)
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork("jvnotif", (if (resetSchedules) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP), fetchNotifRequest)
     }
 
-    fun launchNow() {
+    fun launchNow(context: Context) {
         val fetchNotifRequest = OneTimeWorkRequestBuilder<FetchNotifWorker>().build()
-        WorkManager.getInstance().enqueue(fetchNotifRequest)
+        WorkManager.getInstance(context).enqueue(fetchNotifRequest)
     }
 }

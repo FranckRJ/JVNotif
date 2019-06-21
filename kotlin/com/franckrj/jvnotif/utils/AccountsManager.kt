@@ -36,11 +36,11 @@ object AccountsManager {
     }
 
     fun thereIsNewMpSinceLastSavedInfos(): Boolean {
-        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_MP, { it.numberOfMp })
+        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_MP) { it.numberOfMp }
     }
 
     fun thereIsNewStarsSinceLastSavedInfos(): Boolean {
-        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_STARS, { it.numberOfStars })
+        return thereIsNewMpOrStarsSinceLastSavedInfos(PrefsManager.StringPref.Names.LIST_OF_NUMBER_OF_STARS) { it.numberOfStars }
     }
 
     private fun thereIsNewMpOrStarsSinceLastSavedInfos(prefNameOfSavedInfos: PrefsManager.StringPref.Names, getMpOrStarsFromAccount: (AccountInfos) -> Int): Boolean {

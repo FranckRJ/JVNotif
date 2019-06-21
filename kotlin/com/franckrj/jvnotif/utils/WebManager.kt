@@ -87,9 +87,7 @@ object WebManager {
         } catch (e: Exception) {
             return null
         } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect()
-            }
+            urlConnection?.disconnect()
             if (reader != null) {
                 try {
                     reader.close()

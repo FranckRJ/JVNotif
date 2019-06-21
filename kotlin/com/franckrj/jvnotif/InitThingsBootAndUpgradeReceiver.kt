@@ -18,7 +18,7 @@ class InitThingsBootAndUpgradeReceiver : BroadcastReceiver() {
             NotifsManager.cancelNotifAndClearInfos(NotifsManager.STARS_NOTIF_ID, context)
 
             if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-                WorkerShedulesManager.initSchedulers()
+                WorkerShedulesManager.initSchedulers(context)
             }
         }
     }

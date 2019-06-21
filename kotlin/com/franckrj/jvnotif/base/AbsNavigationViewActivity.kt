@@ -254,7 +254,7 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         PrefsManager.applyChanges()
 
         if (AccountsManager.getListOfAccounts().isNotEmpty()) {
-            WorkerShedulesManager.initSchedulers(true)
+            WorkerShedulesManager.initSchedulers(applicationContext, true)
         }
 
         updateNavigationMenu()

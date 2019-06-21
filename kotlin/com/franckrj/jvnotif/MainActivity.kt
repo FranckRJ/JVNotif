@@ -44,7 +44,7 @@ class MainActivity : AbsNavigationViewActivity() {
     @Suppress("ObjectLiteralToLambda")
     private val swipeRefreshActivatedListener = object : SwipeRefreshLayout.OnRefreshListener {
         override fun onRefresh() {
-            WorkerShedulesManager.launchNow()
+            WorkerShedulesManager.launchNow(applicationContext)
         }
     }
 
@@ -161,9 +161,9 @@ class MainActivity : AbsNavigationViewActivity() {
         swipeRefresh?.setColorSchemeResources(R.color.colorAccent)
 
         if (savedInstanceState == null) {
-            WorkerShedulesManager.launchNow()
+            WorkerShedulesManager.launchNow(applicationContext)
 
-            WorkerShedulesManager.initSchedulers()
+            WorkerShedulesManager.initSchedulers(applicationContext)
         } else {
             val currentNotifInfoText: String? = savedInstanceState.getString(SAVE_NOTIF_INFO_TEXT, null)
 
@@ -246,9 +246,9 @@ class MainActivity : AbsNavigationViewActivity() {
 
             init {
                 val clickableView: View = mainView.findViewById(R.id.clickable_layout_notif_row)
-                clickableView.setOnClickListener({
+                clickableView.setOnClickListener {
                     onItemClickedListener?.onNotifClickedListener(notifNicknameView.text.toString(), typeOfNotif)
-                })
+                }
             }
 
             fun setInformations(newNotifInfo: NotifInfo, context: Context) {
