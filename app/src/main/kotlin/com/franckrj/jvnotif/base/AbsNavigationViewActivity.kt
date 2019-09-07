@@ -228,12 +228,12 @@ abstract class AbsNavigationViewActivity: AbsToolbarActivity(), AccountMenuDialo
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
+    override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         toggleForDrawer?.onConfigurationChanged(newConfig)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         @Suppress("LiftReturnOrAssignment")
         if (toggleForDrawer?.onOptionsItemSelected(item) == true) {
             return true

@@ -1,6 +1,9 @@
 package com.franckrj.jvnotif.utils
 
 import android.content.res.Resources
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.annotation.ColorInt
@@ -28,6 +31,15 @@ object Undeprecator {
         } else {
             @Suppress("DEPRECATION")
             return resources.getDrawable(drawableId)
+        }
+    }
+
+    fun drawableSetColorFilterWithSrcAtop(drawable: Drawable, @ColorInt color: Int) {
+        if (Build.VERSION.SDK_INT >= 29) {
+            drawable.colorFilter = BlendModeColorFilter(color, BlendMode.SRC_ATOP)
+        } else {
+            @Suppress("DEPRECATION")
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_ATOP)
         }
     }
 

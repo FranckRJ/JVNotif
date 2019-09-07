@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object WebManager {
-    private const val userAgentString: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:65.0) Gecko/20100101 Firefox/65.0"
+    private const val userAgentString: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:70.0) Gecko/20100101 Firefox/70.0"
 
     fun sendRequest(newLinkToPage: String, requestMethod: String, requestParameters: String, cookiesInAString: String, currentInfos: WebInfos): String? {
         var linkToPage = newLinkToPage

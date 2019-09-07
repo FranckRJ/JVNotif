@@ -4,7 +4,6 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.widget.BaseAdapter
 import android.content.Context
-import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
@@ -118,9 +117,9 @@ class NavigationMenuAdapter(private val parentActivity: Activity) : BaseAdapter(
             val compoundDrawable: Drawable = Undeprecator.resourcesGetDrawable(parentActivity.resources, currentMenuItemInfo.drawableResId).mutate()
 
             if (rowSelected == position && currentMenuItemInfo.isEnabled) {
-                compoundDrawable.setColorFilter(selectedItemColor, PorterDuff.Mode.SRC_ATOP)
+                Undeprecator.drawableSetColorFilterWithSrcAtop(compoundDrawable, selectedItemColor)
             } else {
-                compoundDrawable.setColorFilter(unselectedItemColor, PorterDuff.Mode.SRC_ATOP)
+                Undeprecator.drawableSetColorFilterWithSrcAtop(compoundDrawable, unselectedItemColor)
             }
 
             holder.contentTextView.setCompoundDrawablesWithIntrinsicBounds(compoundDrawable, null, null, null)

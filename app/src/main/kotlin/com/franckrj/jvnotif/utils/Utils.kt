@@ -22,7 +22,7 @@ object Utils {
     fun putStringInClipboard(textToCopy: String, fromThisActivity: Activity) {
         val clipboardService: ClipboardManager = fromThisActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip: ClipData = ClipData.newPlainText(textToCopy, textToCopy)
-        clipboardService.primaryClip = clip
+        clipboardService.setPrimaryClip(clip)
     }
 
     fun openPageForThisNickname(pageLink: String, nicknameToUse: String, fromThisActivity: Activity) {
