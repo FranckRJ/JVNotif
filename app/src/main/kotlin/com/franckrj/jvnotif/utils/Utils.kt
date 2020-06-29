@@ -34,6 +34,11 @@ object Utils {
     }
 
     fun suppressNotifForCookieUsageInWebview() {
-        CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", "euconsent=set")
+        CookieManager.getInstance().setCookie("https://www.jeuxvideo.com", "_cmpQcif3pcsupported=1");
+        CookieManager.getInstance().setCookie("https://jeuxvideo.com", "_gcl_au=1.1.1298996599.1593456467");
+        CookieManager.getInstance().setCookie("https://www.jeuxvideo.com", "euconsent=BO1ximpO1ximpAKAiCENDQAAAAAweAAA");
+        CookieManager.getInstance().setCookie("https://www.jeuxvideo.com", "googlepersonalization=O1ximpO1ximpAA");
+        CookieManager.getInstance().setCookie("https://www.jeuxvideo.com", "noniabvendorconsent=O1ximpO1ximpAKAiAA8AAA");
+        CookieManager.getInstance().setCookie("https://www.jeuxvideo.com", "visitor_country=FR");
     }
 }
