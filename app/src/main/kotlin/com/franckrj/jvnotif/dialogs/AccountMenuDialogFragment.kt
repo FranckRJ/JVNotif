@@ -34,17 +34,17 @@ class AccountMenuDialogFragment : DialogFragment() {
             override fun onClick(dialog: DialogInterface?, which: Int) {
                 when (which) {
                     POS_READ_MP -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", accountNickname, requireActivity())
+                        Utils.openPageForThisNickname("https://www.jeuxvideo.com/messages-prives/boite-reception.php", accountNickname, requireActivity())
                         AccountsManager.setNumberOfMp(accountNickname, 0)
                         AccountsManager.saveNumberOfMp()
                     }
                     POS_READ_STARS -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + accountNickname.toLowerCase() + "?mode=abonnements", accountNickname, requireActivity())
+                        Utils.openPageForThisNickname("https://www.jeuxvideo.com/profil/" + accountNickname.toLowerCase() + "?mode=abonnements", accountNickname, requireActivity())
                         AccountsManager.setNumberOfStars(accountNickname, 0)
                         AccountsManager.saveNumberOfStars()
                     }
                     POS_SEND_MP -> {
-                        Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/nouveau.php", accountNickname, requireActivity())
+                        Utils.openPageForThisNickname("https://www.jeuxvideo.com/messages-prives/nouveau.php", accountNickname, requireActivity())
                     }
                     POS_DELETE_ACCOUNT -> {
                         val parentActivity: Activity? = activity

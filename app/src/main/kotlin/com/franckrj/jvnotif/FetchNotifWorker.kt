@@ -41,7 +41,7 @@ class FetchNotifWorker(val context: Context, params: WorkerParameters) : Worker(
         currentWebInfos.useBiggerTimeoutTime = false
 
         do {
-            pageContent = WebManager.sendRequest("http://www.jeuxvideo.com/mailform.php", "GET", "", cookie, currentWebInfos)
+            pageContent = WebManager.sendRequest("https://www.jeuxvideo.com/mailform.php", "GET", "", cookie, currentWebInfos)
             numberOfTrysRemaining -= 1
             currentWebInfos.useBiggerTimeoutTime = true
         } while (pageContent.isNullOrEmpty() && numberOfTrysRemaining > 0)

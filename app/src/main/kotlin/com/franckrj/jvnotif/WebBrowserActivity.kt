@@ -52,7 +52,7 @@ class WebBrowserActivity : AbsToolbarActivity() {
 
             Undeprecator.cookieManagerRemoveAllCookies(CookieManager.getInstance())
             if (newCookiesToUse != null && !newCookiesToUse.isNullOrEmpty()) {
-                CookieManager.getInstance().setCookie("http://www.jeuxvideo.com/", newCookiesToUse)
+                CookieManager.getInstance().setCookie("https://www.jeuxvideo.com/", newCookiesToUse)
             }
             Utils.suppressNotifForCookieUsageInWebview()
         }

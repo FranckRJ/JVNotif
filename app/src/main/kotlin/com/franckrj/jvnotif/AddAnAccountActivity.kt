@@ -27,7 +27,7 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
         override fun onClick(view: View?) {
             if (nicknameText != null && nicknameText?.text.toString().isNotEmpty()) {
                 /* Récupération du cookie "coniunctio", de manière un peu compliquée mais qui fonctionne. */
-                val allCookiesInstring: String = CookieManager.getInstance().getCookie("http://www.jeuxvideo.com/")
+                val allCookiesInstring: String = CookieManager.getInstance().getCookie("https://www.jeuxvideo.com/")
                 val allCookiesInStringArray: Array<String> = TextUtils.split(allCookiesInstring, ";")
 
                 val connectCookieValue: String? = allCookiesInStringArray

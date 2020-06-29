@@ -51,11 +51,11 @@ class MainActivity : AbsNavigationViewActivity() {
     private val notifInListClickedListener = object : NotifListAdapter.NotifViewHolder.NotifClickedListener {
         override fun onNotifClickedListener(nicknameOfNotif: String, notifType: NotifListAdapter.NotifInfo.NotifTypeName) {
             if (notifType == NotifListAdapter.NotifInfo.NotifTypeName.MP) {
-                Utils.openPageForThisNickname("http://www.jeuxvideo.com/messages-prives/boite-reception.php", nicknameOfNotif, this@MainActivity)
+                Utils.openPageForThisNickname("https://www.jeuxvideo.com/messages-prives/boite-reception.php", nicknameOfNotif, this@MainActivity)
                 AccountsManager.setNumberOfMp(nicknameOfNotif, 0)
                 AccountsManager.saveNumberOfMp()
             } else if (notifType == NotifListAdapter.NotifInfo.NotifTypeName.STARS) {
-                Utils.openPageForThisNickname("http://www.jeuxvideo.com/profil/" + nicknameOfNotif.toLowerCase() + "?mode=abonnements", nicknameOfNotif, this@MainActivity)
+                Utils.openPageForThisNickname("https://www.jeuxvideo.com/profil/" + nicknameOfNotif.toLowerCase() + "?mode=abonnements", nicknameOfNotif, this@MainActivity)
                 AccountsManager.setNumberOfStars(nicknameOfNotif, 0)
                 AccountsManager.saveNumberOfStars()
             }
