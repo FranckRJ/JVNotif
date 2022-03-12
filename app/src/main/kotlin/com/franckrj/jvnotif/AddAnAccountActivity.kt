@@ -6,6 +6,7 @@ import android.text.TextUtils
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
@@ -78,10 +79,15 @@ class AddAnAccountActivity : AbsHomeIsBackActivity() {
 
         @SuppressLint("SetJavaScriptEnabled")
         tmpWebView.settings.javaScriptEnabled = true
+        tmpWebView.settings.domStorageEnabled = true
         Undeprecator.webSettingsSetSaveFormData(tmpWebView.settings, false)
         Undeprecator.webSettingsSetSavePassword(tmpWebView.settings, false)
         tmpWebView.clearCache(true)
         tmpWebView.clearHistory()
+
+        // Clears HTML5, SQL and JS cache (DOM storage).
+        // Disables dark mode as a side effect, however.
+        WebStorage.getInstance().deleteAllData();
 
         tmpWebView.loadUrl("https://www.jeuxvideo.com/login")
 

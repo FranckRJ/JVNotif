@@ -72,6 +72,7 @@ class WebBrowserActivity : AbsToolbarActivity() {
 
         @SuppressLint("SetJavaScriptEnabled")
         tmpWebView.settings.javaScriptEnabled = true
+        tmpWebView.settings.domStorageEnabled = true
         tmpWebView.settings.useWideViewPort = true
         tmpWebView.settings.setSupportZoom(true)
         tmpWebView.settings.builtInZoomControls = true
