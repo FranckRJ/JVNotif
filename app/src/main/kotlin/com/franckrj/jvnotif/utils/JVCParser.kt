@@ -1,8 +1,8 @@
 package com.franckrj.jvnotif.utils
 
 object JVCParser {
-    private val numberOfMpJVCPattern = Regex("""<div class=".*?account-mp.*?">[^<]*<span[^c]*class="jv-account-number-mp[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
-    private val numberOfStarsJVCPattern = Regex("""<div class=".*?account-notif.*?">[^<]*<span[^c]*class="jv-account-number-notif[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
+    private val numberOfMpJVCPattern = Regex("""<div class=".*?headerAccount--pm.*?">[^<]*<span[^c]*class="headerAccount__pm[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
+    private val numberOfStarsJVCPattern = Regex("""<div class=".*?headerAccount--notif.*?">[^<]*<span[^c]*class="headerAccount__notif[^"]*".*?data-val="([^"]*)"""", RegexOption.DOT_MATCHES_ALL)
 
     fun getMpAndStarsNumbersFromPage(pageSource: String): AccountsManager.MpAndStarsNumbers {
         var mpNumberFromPage: Int = AccountsManager.MpAndStarsNumbers.PARSING_ERROR
