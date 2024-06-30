@@ -1,9 +1,12 @@
 package com.franckrj.jvnotif
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -15,6 +18,9 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.franckrj.jvnotif.base.AbsNavigationViewActivity
 import com.franckrj.jvnotif.utils.AccountsManager
 import com.franckrj.jvnotif.utils.WorkerShedulesManager
@@ -178,6 +184,16 @@ class MainActivity : AbsNavigationViewActivity() {
             tmpWebView.clearCache(true)
             PrefsManager.putInt(PrefsManager.IntPref.Names.NUMBER_OF_WEBVIEW_OPEN_SINCE_CACHE_CLEARED, 0)
             PrefsManager.applyChanges()
+        }
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                    if (!isGranted) {
+                        Toast.makeText(this, R.string.notificationPermissionIsRequired, Toast.LENGTH_LONG).show()
+                    }
+                }.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
     }
 

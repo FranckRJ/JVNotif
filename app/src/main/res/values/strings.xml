@@ -52,6 +52,7 @@
     <string name="errorDetailedParsingAll">Erreur, impossible de récupérer les informations nécessaires sur la page de jeuxvideo.com. Veuillez vérifier que votre compte est toujours valide (en consultant vos MP / notifs via le menu latéral), sinon supprimez-le puis rajoutez-le à nouveau. Vérifiez aussi si une mise à jour de l\'application n\'est pas disponible.</string>
     <string name="errorDetailedParsingMp">Erreur, impossible de récupérer les informations nécessaires à propos des MP sur la page de jeuxvideo.com. Veuillez vérifier si une mise à jour de l\'application n\'est pas disponible.</string>
     <string name="errorDetailedParsingStars">Erreur, impossible de récupérer les informations nécessaires à propos des notifs sur la page de jeuxvideo.com. Veuillez vérifier si une mise à jour de l\'application n\'est pas disponible.</string>
+    <string name="notificationPermissionIsRequired">La permission d\'envoi de notifications est nécessaire à JVNotif.</string>
 
     <string-array name="choicesForAccountMenu">
         <item>@string/readMp</item>
