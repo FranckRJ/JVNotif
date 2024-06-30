@@ -50,7 +50,7 @@ object NotifsManager {
             val intent = Intent(context, NotificationDismissedReceiver::class.java)
             intent.putExtra(NotificationDismissedReceiver.EXTRA_NOTIF_ID, notifType.notifId)
 
-            notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, 0))
+            notificationBuilder.setDeleteIntent(PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE))
         }
 
         if (notifType.clickToOpenHome) {
@@ -59,7 +59,7 @@ object NotifsManager {
             intent.putExtra(MainActivity.EXTRA_NOTIF_IS_CANCELED, true)
             intent.putExtra(MainActivity.EXTRA_NOTIF_CANCELED_ID, notifType.notifId)
 
-            notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, 0))
+            notificationBuilder.setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE))
             notificationBuilder.setAutoCancel(true)
         }
 
